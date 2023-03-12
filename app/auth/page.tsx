@@ -12,7 +12,7 @@ const page = () => {
 				<Image className="mx-auto" src="/logo.png" alt="Логотип" width={250} height={144} />
 				<p className="text-xl font-medium text-center">Вход в систему управления</p>
 				<TextBox placeholder="Почта" Icon={FiMail} />
-				<TextBox placeholder="Пароль" Icon={SlLock} />
+				<TextBox type="password" placeholder="Пароль" Icon={SlLock} />
 				<Button>Авторизоваться</Button>
 				<div className="flex justify-between justify-items-end gap-16 font-medium">
 					<Link href="auth/reg">Зарегестрироваться</Link>

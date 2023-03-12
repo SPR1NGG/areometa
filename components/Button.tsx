@@ -1,10 +1,17 @@
-interface Props {
+'use client';
+
+import { ButtonHTMLAttributes } from 'react';
+
+interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
 	children: string;
 }
 
-const Button = ({ children }: Props) => {
+const Button = ({ children, ...props }: Props) => {
 	return (
-		<button className="bg-[linear-gradient(93deg,#E86605,#FCDF00)] text-white font-medium rounded-xl px-8 py-4">
+		<button
+			{...props}
+			className="bg-[linear-gradient(93deg,#E86605,#FCDF00)] text-white font-medium rounded-xl px-8 py-4"
+		>
 			{children}
 		</button>
 	);
