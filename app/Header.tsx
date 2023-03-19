@@ -15,7 +15,7 @@ const Header = () => {
 			<div className="flex gap-4 items-center">
 				<Image alt="логотип" src="/logo.png" width={140} height={70}></Image>
 				<Button onClick={() => setActive(true)}>Создать конференцию</Button>
-				{active && <PopupCreate setActive={setActive} />}
+				{/* {active && <PopupCreate setActive={setActive} />} */}
 			</div>
 
 			<div className="flex items-center gap-4">

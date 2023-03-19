@@ -8,6 +8,7 @@ import { BsFillPersonFill } from 'react-icons/bs';
 import Link from 'next/link';
 import Checkbox from '@components/Checkbox';
 import { useForm } from 'react-hook-form';
+import { useState } from 'react';
 
 type Inputs = {
 	name: string;
@@ -24,6 +25,8 @@ const page = () => {
 		formState: { errors },
 	} = useForm<Inputs>();
 
+	const [message, setMessage] = useState('');
+
 	const onSubmit = async (data: Inputs) => {
 		const res = await fetch('https://aresmeta-back.sqkrv.com/auth/register', {
 			method: 'POST',
@@ -36,6 +39,10 @@ const page = () => {
 				name: data.name,
 			}),
 		});
+
+		if (res.status === 409) {
+			setMessage('Такой email уже зарегистрирован');
+		}
 	};
 
 	return (
@@ -46,6 +53,7 @@ const page = () => {
 			>
 				<Image className="mx-auto" src="/logo.png" alt="Логотип" width={250} height={144} />
 				<p className="text-xl font-medium text-center">Регистрация</p>
+				<p className="text-center">{message}</p>
 				<TextBox
 					useForm={() =>
 						register('email', {
