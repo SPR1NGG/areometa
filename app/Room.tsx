@@ -5,15 +5,20 @@ import { FaLock } from 'react-icons/fa';
 
 interface Props {
 	isPublic?: boolean;
+	name: string;
+	datetime: string;
 }
 
-const Room = ({ isPublic }: Props) => {
+const Room = ({ isPublic, name, datetime }: Props) => {
+	//'2020', '03', '19'
+	const date = datetime.split('T')[0].split('-');
+
 	return (
 		<div className="bg-white rounded-xl shadow grid grid-cols-[auto,1fr,auto] items-center p-4">
-			<div>
+			<div className="flex flex-col gap-2">
 				<div className="flex items-center gap-2">
 					<BsFillCalendarCheckFill fill="#FFCC66" />
-					Дата проведения: 12.03.2024
+					Дата проведения: {`${date[2]}.${date[1]}.${date[0]}`}
 				</div>
 				<div className="flex items-center gap-2">
 					{isPublic ? (
@@ -29,7 +34,7 @@ const Room = ({ isPublic }: Props) => {
 					)}
 				</div>
 			</div>
-			<p className="text-center">Название конференции</p>
+			<p className="text-center">{name}</p>
 		</div>
 	);
 };
