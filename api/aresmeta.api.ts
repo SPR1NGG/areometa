@@ -22,6 +22,7 @@ class AresmetaAPI {
 	}) {
 		await fetch(`${this.base_url}/conferences`, {
 			method: 'POST',
+			cache: 'no-store',
 			headers: {
 				Authorization: `Bearer ${token}`,
 				'Content-type': 'application/json',
@@ -38,6 +39,7 @@ class AresmetaAPI {
 	async removeConference({ token, id }: { token: string; id: string }) {
 		await fetch(`${this.base_url}/conferences/${id}`, {
 			method: 'DELETE',
+			cache: 'no-store',
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
@@ -47,12 +49,14 @@ class AresmetaAPI {
 	async sendResetEmail(email: string) {
 		await fetch(this.base_url + `/auth/reset/${email}`, {
 			method: 'POST',
+			cache: 'no-store',
 		});
 	}
 
 	async reset(token: string, newPass: string) {
 		await fetch(this.base_url + `/auth/reset?token=${token}`, {
 			method: 'POST',
+			cache: 'no-store',
 			headers: {
 				'Content-type': 'application/json',
 			},
@@ -79,7 +83,11 @@ class AresmetaAPI {
 	}
 
 	async getConferences() {
-		return await (await fetch('https://aresmeta-back.sqkrv.com/conferences')).json();
+		return await (
+			await fetch('https://aresmeta-back.sqkrv.com/conferences', {
+				cache: 'no-store',
+			})
+		).json();
 	}
 }
 

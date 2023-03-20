@@ -34,13 +34,14 @@ const UserList = ({ label, name, refValue }: IProps) => {
 	const handleClick = async () => {
 		console.log('first');
 		const res = await fetch(`https://aresmeta-back.sqkrv.com/users/${watch('useremail')}`, {
+			cache: 'no-store',
 			headers: {
 				Authorization: `Bearer ${session.data.user.accessToken}`,
 			},
 		});
 		const user = await res.json();
 		setUsers((old) => [...old, { email: user.email, id: user.id }]);
-    refValue?.push()
+		refValue?.push();
 		reset({ useremail: '' });
 	};
 
