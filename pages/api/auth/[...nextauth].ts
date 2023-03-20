@@ -45,7 +45,7 @@ export const authOptions: NextAuthOptions = {
 	],
 
 	callbacks: {
-		async jwt({ token, user }) {
+		async jwt({ token, user, account }) {
 			//  "user" parameter is the object received from "authorize"
 			//  "token" is being send below to "session" callback...
 			//  ...so we set "user" param of "token" to object from "authorize"...
@@ -55,11 +55,17 @@ export const authOptions: NextAuthOptions = {
 				token.sub = user.id;
 			}
 
+			if (account) {
+				// @ts-ignore
+				token.accessToken = user.accessToken;
+			}
+
 			return token;
 		},
 		async session({ session, token }) {
 			session.user.email = token.email;
 			session.user.id = token.sub;
+			session.user.accessToken = token.accessToken;
 			return session;
 		},
 	},

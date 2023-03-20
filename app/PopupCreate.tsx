@@ -3,10 +3,14 @@ import Select from '@components/Select';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import ru from 'date-fns/locale/ru';
 import { Button, Input } from '@material-tailwind/react';
-import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react';
+import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from 'react';
 import { RxCross2 } from 'react-icons/rx';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useForm } from 'react-hook-form';
+import UserList from './UserList';
+import { useSession } from 'next-auth/react';
+import aresmetaApi from 'api/aresmeta.api';
+import { AxiosResponse } from 'axios';
 
 registerLocale('ru', ru);
 
@@ -16,10 +20,13 @@ interface Props {
 
 type Inputs = {
 	file: File[];
+	name: string;
 };
 
 const PopupCreate = ({ setActive }: Props) => {
 	const [startDate, setStartDate] = useState(new Date());
+	const session = useSession() as any;
+
 	const {
 		register,
 		handleSubmit,
@@ -28,8 +35,21 @@ const PopupCreate = ({ setActive }: Props) => {
 		formState: { errors },
 	} = useForm<Inputs>();
 	const [images, setImages] = useState<File[]>([]);
+	const listeners = useRef<{ email: string; id: string }[]>();
+	const speakers = useRef<{ email: string; id: string }[]>();
 
-	const onSubmit = (data: Inputs) => {};
+	const onSubmit = async (data: Inputs) => {
+		const uploadedImg: AxiosResponse<string[]> = await aresmetaApi.uploadImages(
+			images,
+			session.data.user.accessToken,
+		);
+
+		await aresmetaApi.createConference({
+			token: session.data.user.accessToken,
+			name: watch('name'),
+			images: uploadedImg.data,
+		});
+	};
 
 	const handleMultipleImages = (e: ChangeEvent<HTMLInputElement>) => {
 		const selectedFiles: string[] = [];
@@ -60,6 +80,14 @@ const PopupCreate = ({ setActive }: Props) => {
 					nonce={undefined}
 					onResize={undefined}
 					onResizeCapture={undefined}
+					{...register('name')}
+				/>
+				<Select></Select>
+				<DatePicker
+					locale="ru"
+					className="w-full border-t-blue-gray-200 text-blue-gray-700 rounded-lg"
+					selected={startDate}
+					onChange={(date) => date && setStartDate(date)}
 				/>
 				<input
 					{...register('file')}
@@ -68,6 +96,7 @@ const PopupCreate = ({ setActive }: Props) => {
 					id="banner"
 					className="inputfile"
 					onChange={(e) => handleMultipleImages(e)}
+					multiple
 				/>
 				<label htmlFor="banner" className="cursor-pointer">
 					<Button
@@ -77,24 +106,21 @@ const PopupCreate = ({ setActive }: Props) => {
 						onResize={undefined}
 						onResizeCapture={undefined}
 					>
-						Загрузить баннер
+						Загрузить картинки
 					</Button>
 				</label>
-				{images.length === 1 && (
-					<img
-						className="h-[100px] w-[100px] border border-black rounded-xl"
-						src={URL.createObjectURL(images[0])}
-						alt=""
-					/>
-				)}
-				<Select></Select>
-				<DatePicker
-					locale="ru"
-					className="w-full border-t-blue-gray-200 text-blue-gray-700 rounded-lg"
-					selected={startDate}
-					onChange={(date) => date && setStartDate(date)}
-				/>
-				<p>Назначить спикера</p>
+				<div className="flex gap-2">
+					{images.length > 0 &&
+						images.map((img) => (
+							<img
+								className="h-[100px] w-[100px] border border-black rounded-xl"
+								src={URL.createObjectURL(img)}
+								alt=""
+							/>
+						))}
+				</div>
+				<UserList label="Спикеры" name="speak" />
+				<UserList label="Слушатели" name="list" />
 				<Button
 					color="amber"
 					type="submit"

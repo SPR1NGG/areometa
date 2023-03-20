@@ -23,8 +23,15 @@ const page = async () => {
 							<Filter filterLabels={timeLabels} />
 						</div>
 						<div className="flex flex-col gap-4 pr-4 overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-600 scrollbar-thumb-rounded">
-							{conferences.map(({ name, datetime, id, visibility }) => (
-								<Room name={name} datetime={datetime} key={id} isPublic={visibility === 'public'} />
+							{conferences.map(({ name, datetime, id, visibility, creator }) => (
+								<Room
+									name={name}
+									id={id}
+									datetime={datetime}
+									key={id}
+									creator={creator}
+									isPublic={visibility === 'public'}
+								/>
 							))}
 						</div>
 					</div>

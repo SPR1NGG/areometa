@@ -1,17 +1,26 @@
+'use client';
 import React from 'react';
 import { BsFillCalendarCheckFill } from 'react-icons/bs';
 import { MdPublic } from 'react-icons/md';
 import { FaLock } from 'react-icons/fa';
+import { AiFillDelete } from 'react-icons/ai';
+import aresmetaApi from 'api/aresmeta.api';
+import { useSession } from 'next-auth/react';
 
 interface Props {
+	id: string;
 	isPublic?: boolean;
 	name: string;
 	datetime: string;
+	creator: string;
 }
 
-const Room = ({ isPublic, name, datetime }: Props) => {
-	//'2020', '03', '19'
+const Room = ({ isPublic, name, datetime, id, creator }: Props) => {
 	const date = datetime.split('T')[0].split('-');
+	const session = useSession() as any;
+	const handleClick = async () => {
+		await aresmetaApi.removeConference({ id, token: session.data.user.accessToken });
+	};
 
 	return (
 		<div className="bg-white rounded-xl shadow grid grid-cols-[auto,1fr,auto] items-center p-4">
@@ -35,6 +44,9 @@ const Room = ({ isPublic, name, datetime }: Props) => {
 				</div>
 			</div>
 			<p className="text-center">{name}</p>
+			{session.data.user.id === creator && (
+				<AiFillDelete className="cursor-pointer" fill="#FF6666" onClick={handleClick} />
+			)}
 		</div>
 	);
 };
