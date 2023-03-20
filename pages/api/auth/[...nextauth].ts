@@ -19,7 +19,7 @@ export const authOptions: NextAuthOptions = {
 			async authorize(credentials) {
 				const { username, password } = credentials as any;
 
-				const res = await fetch(`${process.env.API_URL}/auth/login`, {
+				const res = await fetch(`https://aresmeta-back.sqkrv.com/auth/login`, {
 					method: 'POST',
 					headers: {
 						'Content-type': 'application/json',
