@@ -5,15 +5,21 @@ import { ErrorMessage } from '@hookform/error-message';
 import AresmetaApi from 'api/aresmeta.api';
 import Image from 'next/image';
 import Link from 'next/link';
+import { redirect, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { FiMail } from 'react-icons/fi';
+import { SlLock } from 'react-icons/sl';
 import { toast } from 'react-toastify';
+import { ToastItem } from 'react-toastify/dist/types';
 
 type Inputs = {
-	email: string;
+	newpass: string;
 };
 
-const page = () => {
+interface Props {
+	searchParams?: { [key: string]: string };
+}
+
+const page = ({ searchParams }: Props) => {
 	const {
 		register,
 		handleSubmit,
@@ -21,11 +27,19 @@ const page = () => {
 		reset,
 		formState: { errors },
 	} = useForm<Inputs>();
+	const router = useRouter();
 
 	const onSubmit = async () => {
-		await AresmetaApi.sendResetEmail(watch('email'));
-		reset({ email: '' });
-		toast.success('Ссылка отправлена на вашу почту');
+		if (searchParams) {
+			await AresmetaApi.reset(searchParams.token, watch('newpass'));
+			reset({ newpass: '' });
+			toast.success('Пароль успешно изменён');
+			toast.onChange((payload: ToastItem) => {
+				if (payload.status === 'removed') {
+					router.push('/auth');
+				}
+			});
+		}
 	};
 
 	return (
@@ -33,26 +47,24 @@ const page = () => {
 			<div className="bg-white rounded-2xl px-16 py-10 flex flex-col gap-8">
 				<Image className="mx-auto" src="/logo.png" alt="Логотип" width={250} height={144} />
 				<p className="text-xl font-medium text-center">Восстановление пароля</p>
-				<p>
-					Для получения инструкций по востановлению пароля, введите адрес электронной почты,
-					указанный при регистрации
-				</p>
 				<div>
 					<TextBox
 						useForm={() =>
-							register('email', {
+							register('newpass', {
 								required: 'Это поле обязательно',
+								minLength: {
+									value: 8,
+									message: 'Пароль должен быть не меньше 8 символов',
+								},
 							})
 						}
-						placeholder="Почта"
-						Icon={FiMail}
+						placeholder="Новый пароль"
+						Icon={SlLock}
+						type="password"
 					/>
-					<ErrorMessage className="error" errors={errors} as="p" name="email" />
+					<ErrorMessage className="error" errors={errors} as="p" name="newpass" />
 				</div>
 				<Button onClick={handleSubmit(onSubmit)}>Сбросить пароль</Button>
-				<div className="text-center gap-16 font-medium">
-					<Link href={'auth'}>Авторизоваться</Link>
-				</div>
 			</div>
 		</div>
 	);

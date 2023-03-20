@@ -5,6 +5,6 @@ export default interface IConference {
 	visibility: 'public' | 'private';
 	banner_filename: string;
 	creator: string;
-	// media_file: [[Object], [Object]];
-	// conference_member: [[Object]];
+	media_file: [[Object], [Object]];
+	conference_member: [[Object]];
 }

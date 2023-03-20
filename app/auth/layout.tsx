@@ -1,5 +1,8 @@
+'use client';
 import Image from 'next/image';
 import DocLink from './DocLink';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
@@ -20,6 +23,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 					<Image src={'/metaworld.png'} alt="метамир" width={166} height={42} />
 				</div>
 			</div>
+			<ToastContainer
+				position="bottom-left"
+				autoClose={2500}
+				hideProgressBar={false}
+				newestOnTop={false}
+				pauseOnFocusLoss={false}
+				closeOnClick
+				rtl={false}
+				draggable
+				pauseOnHover
+				theme="light"
+			/>
 		</div>
 	);
 }

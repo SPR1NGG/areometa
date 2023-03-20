@@ -1,3 +1,4 @@
+import AresmetaAPI from 'api/aresmeta.api';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import IConference from 'types/conference.interface';
@@ -9,10 +10,8 @@ const page = async () => {
 	const session = await getServerSession();
 	const typeLabels = ['Все', 'Открытые', 'Закрытые'];
 	const timeLabels = ['Все', 'Сегодня', 'Завтра', 'На этой неделе'];
-	const conferences: IConference[] = await (
-		await fetch('https://aresmeta-back.sqkrv.com/conferences')
-	).json();
-
+	const conferences: IConference[] = await AresmetaAPI.getConferences();
+	
 	if (session?.user?.email) {
 		return (
 			<div className="grid h-screen grid-rows-[100px,1fr]">

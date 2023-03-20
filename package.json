@@ -6,6 +6,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@hookform/error-message": "^2.0.1",
     "@material-tailwind/react": "^1.4.2",
     "@tailwindcss/forms": "^0.5.3",
     "classnames": "^2.3.2",
@@ -16,6 +17,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.7",
     "react-icons": "^4.8.0",
+    "react-toastify": "^9.1.1",
     "tailwind-scrollbar": "^2.1.0"
   },
   "devDependencies": {

@@ -37,3 +37,35 @@
 		transform: rotate(360deg);
 	}
 }
+.error {
+	color: #bf1650;
+	margin-top: 8px;
+}
+
+.error::before {
+	display: inline;
+	content: '⚠ ';
+}
+.react-datepicker__header {
+	background: white;
+	border: none;
+}
+
+.react-datepicker__triangle {
+	transform: translate(40px, 0px) !important;
+}
+.react-datepicker__current-month {
+	text-transform: capitalize;
+}
+.inputfile {
+	/* visibility: hidden etc. wont work */
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+.inputfile + label * {
+	pointer-events: none;
+}
