@@ -1,28 +1,58 @@
-import AresmetaAPI from 'api/aresmeta.api';
-import { getServerSession } from 'next-auth';
-import { redirect } from 'next/navigation';
+'use client';
+import aresmetaApi from 'api/aresmeta.api';
+import GetConferencesQuery from 'api/types/getConferences.query';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import IConference from 'types/conference.interface';
-import Filter from './Filter';
+import Filter, { ILabel } from './Filter';
 import Header from './Header';
 import Room from './Room';
 
-const page = async () => {
-	const session = await getServerSession();
-	const typeLabels = ['Все', 'Открытые', 'Закрытые'];
-	const timeLabels = ['Все', 'Сегодня', 'Завтра', 'На этой неделе'];
-	const conferences: IConference[] = await AresmetaAPI.getConferences();
+const page = () => {
+	const [conferences, setConferences] = useState<IConference[]>([]);
+	const [query, setQuery] = useState<GetConferencesQuery>({});
+	const session = useSession();
+	const router = useRouter();
+	const typeLabels: ILabel[] = [
+		{ label: 'Все', value: 'all' },
+		{ label: 'Открытые', value: 'public' },
+		{ label: 'Закрытые', value: 'private' },
+	];
+	const timeLabels: ILabel[] = [
+		{ label: 'Все', value: 'all' },
+		{ label: 'Сегодня', value: 'today' },
+		{ label: 'Завтра', value: 'tomorrow' },
+		{ label: 'Прошедшие', value: 'past' },
+	];
 
-	console.log(session);
+	useEffect(() => {
+		aresmetaApi.getConferences(query).then((data) => setConferences(data));
+	}, [query]);
 
-	if (session?.user?.email) {
+	useEffect(() => {
+		if (!session.data?.user) {
+			router.push('/auth');
+		}
+
+		aresmetaApi.getConferences().then((data) => setConferences(data));
+	}, []);
+
+	if (session?.data?.user) {
 		return (
 			<div className="grid h-screen grid-rows-[100px,1fr]">
 				<Header />
 				<div className="grid grid-cols-1 h-full container mx-auto">
 					<div className="p-4 grid grid-rows-[auto,1fr] gap-4 max-h-[calc(100vh_-_100px)]">
 						<div className="bg-white rounded-xl">
-							<Filter filterLabels={typeLabels} />
-							<Filter filterLabels={timeLabels} />
+							<Filter
+								filterLabels={typeLabels}
+								setQuery={(val) => setQuery((prev) => ({ ...prev, visibility: val }))}
+							/>
+							<Filter
+								filterLabels={timeLabels}
+								setQuery={(val) => setQuery((prev) => ({ ...prev, datetime: val }))}
+							/>
 						</div>
 						<div className="flex flex-col gap-4 overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-600 scrollbar-thumb-rounded">
 							{conferences.map(({ name, datetime, id, visibility, creator }) => (
@@ -40,8 +70,6 @@ const page = async () => {
 				</div>
 			</div>
 		);
-	} else {
-		redirect('/auth');
 	}
 };
 

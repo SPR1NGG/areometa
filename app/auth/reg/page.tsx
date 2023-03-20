@@ -5,6 +5,7 @@ import TextBox from '@components/TextBox';
 import { ErrorMessage } from '@hookform/error-message';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { BsFillPersonFill } from 'react-icons/bs';
 import { FiMail } from 'react-icons/fi';
@@ -28,6 +29,8 @@ const page = () => {
 		formState: { errors },
 	} = useForm<Inputs>();
 
+	const router = useRouter();
+
 	const onSubmit = async (data: Inputs) => {
 		const res = await fetch('https://aresmeta-back.sqkrv.com/auth/register', {
 			method: 'POST',
@@ -46,7 +49,16 @@ const page = () => {
 
 			toast.error(data.message);
 		} else {
-			toast.success('Сообщение с подтверждением аккаунта отправлено вам на почту');
+			toast.success('Сообщение с подтверждением аккаунта отправлено вам на почту', {
+				autoClose: 5000,
+				pauseOnFocusLoss: true,
+			});
+
+			toast.onChange((payload) => {
+				if (payload.status === 'removed' && payload.type === 'success') {
+					router.push('/auth');
+				}
+			});
 		}
 
 		reset({
@@ -134,7 +146,7 @@ const page = () => {
 					</Checkbox>
 					<ErrorMessage className="error" errors={errors} as="p" name="temp" />
 				</div>
-				<Button onClick={handleSubmit(onSubmit)}>Зарегестрироваться</Button>
+				<Button onClick={handleSubmit(onSubmit)}>Зарегистрироваться</Button>
 				<div className="text-center gap-16 font-medium">
 					<Link href={'auth'}>Авторизоваться</Link>
 				</div>

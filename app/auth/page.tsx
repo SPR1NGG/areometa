@@ -5,7 +5,7 @@ import { ErrorMessage } from '@hookform/error-message';
 import { signIn } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { FiMail } from 'react-icons/fi';
 import { SlLock } from 'react-icons/sl';
@@ -76,7 +76,7 @@ const page = () => {
 				</div>
 				<Button onClick={handleSubmit(onSubmit)}>Авторизоваться</Button>
 				<div className="flex justify-between justify-items-end gap-16 font-medium">
-					<Link href="auth/reg">Зарегестрироваться</Link>
+					<Link href="auth/reg">Зарегистрироваться</Link>
 					<Link href="auth/reset">Забыли пароль?</Link>
 				</div>
 			</div>

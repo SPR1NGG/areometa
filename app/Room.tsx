@@ -4,7 +4,7 @@ import { BsFillCalendarCheckFill } from 'react-icons/bs';
 import { MdPublic } from 'react-icons/md';
 import { FaLock } from 'react-icons/fa';
 import { AiFillDelete } from 'react-icons/ai';
-import aresmetaApi from 'api/aresmeta.api';
+import AresmetaApi from 'api/aresmeta.api';
 import { useSession } from 'next-auth/react';
 
 interface Props {
@@ -19,7 +19,7 @@ const Room = ({ isPublic, name, datetime, id, creator }: Props) => {
 	const date = datetime.split('T')[0].split('-');
 	const session = useSession() as any;
 	const handleClick = async () => {
-		await aresmetaApi.removeConference({ id, token: session.data.user.accessToken });
+		await AresmetaApi.removeConference({ id, token: session.data.user.accessToken });
 	};
 
 	return (

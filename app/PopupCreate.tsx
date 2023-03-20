@@ -9,7 +9,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { useForm } from 'react-hook-form';
 import UserList from './UserList';
 import { useSession } from 'next-auth/react';
-import aresmetaApi from 'api/aresmeta.api';
+import AresmetaApi from 'api/aresmeta.api';
 import { AxiosResponse } from 'axios';
 
 registerLocale('ru', ru);
@@ -40,12 +40,12 @@ const PopupCreate = ({ setActive }: Props) => {
 	const speakers = useRef<{ email: string; id: string }[]>();
 
 	const onSubmit = async (data: Inputs) => {
-		const uploadedImg: AxiosResponse<string[]> = await aresmetaApi.uploadImages(
+		const uploadedImg: AxiosResponse<string[]> = await AresmetaApi.uploadImages(
 			images,
 			session.data.user.accessToken,
 		);
 
-		await aresmetaApi.createConference({
+		await AresmetaApi.createConference({
 			token: session.data.user.accessToken,
 			name: watch('name'),
 			images: uploadedImg.data,
@@ -121,7 +121,6 @@ const PopupCreate = ({ setActive }: Props) => {
 							<img
 								className="h-[100px] w-[100px] border border-black rounded-xl"
 								src={URL.createObjectURL(img)}
-								alt=""
 							/>
 						))}
 				</div>
