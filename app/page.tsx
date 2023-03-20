@@ -12,6 +12,8 @@ const page = async () => {
 	const timeLabels = ['Все', 'Сегодня', 'Завтра', 'На этой неделе'];
 	const conferences: IConference[] = await AresmetaAPI.getConferences();
 
+	console.log(session);
+
 	if (session?.user?.email) {
 		return (
 			<div className="grid h-screen grid-rows-[100px,1fr]">

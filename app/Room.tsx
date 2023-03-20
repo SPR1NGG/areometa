@@ -44,7 +44,7 @@ const Room = ({ isPublic, name, datetime, id, creator }: Props) => {
 				</div>
 			</div>
 			<p className="text-center">{name}</p>
-			{session.data.user.id === creator && (
+			{session?.data?.user?.id === creator && (
 				<AiFillDelete className="cursor-pointer" fill="#FF6666" onClick={handleClick} />
 			)}
 		</div>
