@@ -11,7 +11,7 @@ const page = async () => {
 	const typeLabels = ['Все', 'Открытые', 'Закрытые'];
 	const timeLabels = ['Все', 'Сегодня', 'Завтра', 'На этой неделе'];
 	const conferences: IConference[] = await AresmetaAPI.getConferences();
-	
+
 	if (session?.user?.email) {
 		return (
 			<div className="grid h-screen grid-rows-[100px,1fr]">
@@ -22,7 +22,7 @@ const page = async () => {
 							<Filter filterLabels={typeLabels} />
 							<Filter filterLabels={timeLabels} />
 						</div>
-						<div className="flex flex-col gap-4 pr-4 overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-600 scrollbar-thumb-rounded">
+						<div className="flex flex-col gap-4 overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-600 scrollbar-thumb-rounded">
 							{conferences.map(({ name, datetime, id, visibility, creator }) => (
 								<Room
 									name={name}

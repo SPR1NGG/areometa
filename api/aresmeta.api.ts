@@ -11,10 +11,14 @@ class AresmetaAPI {
 		token,
 		name,
 		images,
+		datetime,
+		visibility,
 	}: {
 		name: string;
 		images: string[];
 		token: string;
+		datetime: Date;
+		visibility: 'public' | 'private';
 	}) {
 		await fetch(`${this.base_url}/conferences`, {
 			method: 'POST',
@@ -24,8 +28,8 @@ class AresmetaAPI {
 			},
 			body: JSON.stringify({
 				name,
-				datetime: '2020-03-19T14:21:00+02:00',
-				visibility: 'public',
+				datetime: datetime,
+				visibility: visibility,
 				media_file: images.map((img) => ({ filename: img })),
 			}),
 		});

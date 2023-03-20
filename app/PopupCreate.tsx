@@ -24,7 +24,6 @@ type Inputs = {
 };
 
 const PopupCreate = ({ setActive }: Props) => {
-	const [startDate, setStartDate] = useState(new Date());
 	const session = useSession() as any;
 
 	const {
@@ -35,6 +34,8 @@ const PopupCreate = ({ setActive }: Props) => {
 		formState: { errors },
 	} = useForm<Inputs>();
 	const [images, setImages] = useState<File[]>([]);
+	const [datetime, setDatetime] = useState<Date>(new Date());
+	const [visibility, setVisibility] = useState<'public' | 'private'>('public');
 	const listeners = useRef<{ email: string; id: string }[]>();
 	const speakers = useRef<{ email: string; id: string }[]>();
 
@@ -48,7 +49,11 @@ const PopupCreate = ({ setActive }: Props) => {
 			token: session.data.user.accessToken,
 			name: watch('name'),
 			images: uploadedImg.data,
+			visibility,
+			datetime,
 		});
+
+		setActive(false);
 	};
 
 	const handleMultipleImages = (e: ChangeEvent<HTMLInputElement>) => {
@@ -82,12 +87,12 @@ const PopupCreate = ({ setActive }: Props) => {
 					onResizeCapture={undefined}
 					{...register('name')}
 				/>
-				<Select></Select>
+				<Select setVisibility={setVisibility} />
 				<DatePicker
 					locale="ru"
 					className="w-full border-t-blue-gray-200 text-blue-gray-700 rounded-lg"
-					selected={startDate}
-					onChange={(date) => date && setStartDate(date)}
+					selected={datetime}
+					onChange={(date) => date && setDatetime(date)}
 				/>
 				<input
 					{...register('file')}
@@ -97,6 +102,7 @@ const PopupCreate = ({ setActive }: Props) => {
 					className="inputfile"
 					onChange={(e) => handleMultipleImages(e)}
 					multiple
+					accept="image/jpeg, image/png, image/jpg"
 				/>
 				<label htmlFor="banner" className="cursor-pointer">
 					<Button
