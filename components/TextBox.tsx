@@ -14,7 +14,7 @@ const TextBox = ({ Icon, useForm, ...props }: Props) => {
 	const spread = (useForm && useForm()) || {};
 
 	return (
-		<div className="bg-[linear-gradient(#E86604,#FCDE00)] p-[1px] rounded-xl">
+		<div className="bg-[linear-gradient(#E86604,#FCDE00)] h-[50px] p-[1px] rounded-xl">
 			<div className="bg-white flex items-center rounded-xl p-2 gap-2 ">
 				{Icon && <Icon />}
 				<input

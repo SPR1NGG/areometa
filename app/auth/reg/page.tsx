@@ -45,9 +45,9 @@ const page = () => {
 			const data = await res.json();
 
 			toast.error(data.message);
+		} else {
+			toast.success('Сообщение с подтверждением аккаунта отправлено вам на почту');
 		}
-
-		toast.success('Сообщение с подтверждением аккаунта отправлено вам на почту');
 
 		reset({
 			confirmPassword: '',

@@ -3,7 +3,7 @@ import Select from '@components/Select';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import ru from 'date-fns/locale/ru';
 import { Button, Input } from '@material-tailwind/react';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react';
 import { RxCross2 } from 'react-icons/rx';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useForm } from 'react-hook-form';
@@ -15,7 +15,7 @@ interface Props {
 }
 
 type Inputs = {
-	email: string;
+	file: File[];
 };
 
 const PopupCreate = ({ setActive }: Props) => {
@@ -27,8 +27,19 @@ const PopupCreate = ({ setActive }: Props) => {
 		reset,
 		formState: { errors },
 	} = useForm<Inputs>();
+	const [images, setImages] = useState<File[]>([]);
 
-	const onSubmit = () => {};
+	const onSubmit = (data: Inputs) => {};
+
+	const handleMultipleImages = (e: ChangeEvent<HTMLInputElement>) => {
+		const selectedFiles: string[] = [];
+		const targetFiles: File[] = Array.from(e.target.files!);
+		const targetFilesObject: File[] = [...targetFiles];
+		targetFilesObject.map((file) => {
+			return selectedFiles.push(URL.createObjectURL(file));
+		});
+		setImages(targetFiles);
+	};
 
 	return (
 		<div
@@ -50,7 +61,14 @@ const PopupCreate = ({ setActive }: Props) => {
 					onResize={undefined}
 					onResizeCapture={undefined}
 				/>
-				<input {...register('email')} type="file" name="banner" id="banner" className="inputfile" />
+				<input
+					{...register('file')}
+					type="file"
+					name="banner"
+					id="banner"
+					className="inputfile"
+					onChange={(e) => handleMultipleImages(e)}
+				/>
 				<label htmlFor="banner" className="cursor-pointer">
 					<Button
 						className="text-white"
@@ -62,7 +80,13 @@ const PopupCreate = ({ setActive }: Props) => {
 						Загрузить баннер
 					</Button>
 				</label>
-
+				{images.length === 1 && (
+					<img
+						className="h-[100px] w-[100px] border border-black rounded-xl"
+						src={URL.createObjectURL(images[0])}
+						alt=""
+					/>
+				)}
 				<Select></Select>
 				<DatePicker
 					locale="ru"
@@ -70,6 +94,17 @@ const PopupCreate = ({ setActive }: Props) => {
 					selected={startDate}
 					onChange={(date) => date && setStartDate(date)}
 				/>
+				<p>Назначить спикера</p>
+				<Button
+					color="amber"
+					type="submit"
+					className="text-white"
+					nonce={undefined}
+					onResize={undefined}
+					onResizeCapture={undefined}
+				>
+					Создать конференцию
+				</Button>
 			</form>
 		</div>
 	);
