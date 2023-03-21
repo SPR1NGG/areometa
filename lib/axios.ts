@@ -1,6 +1,8 @@
 import axios from 'axios';
-const BASE_URL = 'http://localhost:3172';
-// const BASE_URL = 'https://aresmeta-back.sqkrv.com';
+const BASE_URL =
+	process.env.NODE_ENV === 'development'
+		? 'http://localhost:3172'
+		: 'https://aresmeta-back.sqkrv.com';
 export default axios.create({
 	baseURL: BASE_URL,
 	headers: { 'Content-Type': 'application/json' },

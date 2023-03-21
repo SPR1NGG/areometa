@@ -31,7 +31,7 @@ const page = () => {
 	];
 
 	useEffect(() => {
-		if (!session.data?.user) {
+		if (session.status === 'unauthenticated') {
 			router.push('/auth');
 		}
 		isFirstRun.current = false;
