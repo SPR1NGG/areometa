@@ -13,7 +13,6 @@ import Room from './Room';
 const page = () => {
 	const [conferences, setConferences] = useState<IConference[]>([]);
 	const [query, setQuery] = useState<GetConferencesQuery>({});
-	const isFirstRun = useRef<boolean>(true);
 	const session = useSession();
 	const router = useRouter();
 	const axiosAuth = useAxiosAuth();
@@ -31,20 +30,22 @@ const page = () => {
 	];
 
 	useEffect(() => {
+		console.log(session);
 		if (session.status === 'unauthenticated') {
 			router.push('/auth');
+		} else {
+			axiosAuth.get('/conferences').then((data) => setConferences(data.data));
 		}
-		isFirstRun.current = false;
-
-		axiosAuth.get('/conferences').then((data) => setConferences(data.data));
-	}, []);
+	}, [session.status]);
 
 	useEffect(() => {
-		axiosAuth
-			.get('/conferences', {
-				params: query,
-			})
-			.then((data) => setConferences(data.data));
+		if (session.status === 'authenticated') {
+			axiosAuth
+				.get('/conferences', {
+					params: query,
+				})
+				.then((data) => setConferences(data.data));
+		}
 	}, [query]);
 
 	if (session?.data?.user) {
