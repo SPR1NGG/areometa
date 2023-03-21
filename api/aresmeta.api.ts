@@ -4,8 +4,8 @@ import GetConferencesQuery from './types/getConferences.query';
 class AresmetaApi {
 	private base_url: string;
 	constructor() {
-		// this.base_url = 'https://aresmeta-back.sqkrv.com';
-		this.base_url = 'http://localhost:3172';
+		this.base_url = 'https://aresmeta-back.sqkrv.com';
+		// this.base_url = 'http://localhost:3172';
 	}
 
 	async createConference({
