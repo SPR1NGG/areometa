@@ -69,3 +69,6 @@
 .inputfile + label * {
 	pointer-events: none;
 }
+input.react-datepicker-time__input {
+	border-radius: 15px;
+}

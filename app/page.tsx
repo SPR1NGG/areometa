@@ -1,6 +1,7 @@
 'use client';
 import aresmetaApi from 'api/aresmeta.api';
 import GetConferencesQuery from 'api/types/getConferences.query';
+import useAxiosAuth from 'lib/hooks/useAxiosAuth';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -15,6 +16,8 @@ const page = () => {
 	const isFirstRun = useRef<boolean>(true);
 	const session = useSession();
 	const router = useRouter();
+	const axiosAuth = useAxiosAuth();
+
 	const typeLabels: ILabel[] = [
 		{ label: 'Все', value: 'all' },
 		{ label: 'Открытые', value: 'public' },
@@ -28,18 +31,21 @@ const page = () => {
 	];
 
 	useEffect(() => {
-		aresmetaApi.getConferences(query).then((data) => setConferences(data));
-	}, [query]);
-
-	useEffect(() => {
-		console.log(session.data?.user);
-		if (!session.data?.user && !isFirstRun.current) {
-			isFirstRun.current = false
+		if (!session.data?.user) {
 			router.push('/auth');
 		}
+		isFirstRun.current = false;
 
-		aresmetaApi.getConferences().then((data) => setConferences(data));
+		axiosAuth.get('/conferences').then((data) => setConferences(data.data));
 	}, []);
+
+	useEffect(() => {
+		axiosAuth
+			.get('/conferences', {
+				params: query,
+			})
+			.then((data) => setConferences(data.data));
+	}, [query]);
 
 	if (session?.data?.user) {
 		return (
@@ -58,16 +64,17 @@ const page = () => {
 							/>
 						</div>
 						<div className="flex flex-col gap-4 overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-600 scrollbar-thumb-rounded">
-							{conferences.map(({ name, datetime, id, visibility, creator }) => (
-								<Room
-									name={name}
-									id={id}
-									datetime={datetime}
-									key={id}
-									creator={creator}
-									isPublic={visibility === 'public'}
-								/>
-							))}
+							{conferences.length > 0 &&
+								conferences.map(({ name, datetime, id, visibility, creator }) => (
+									<Room
+										name={name}
+										id={id}
+										datetime={datetime}
+										key={id}
+										creator={creator}
+										isPublic={visibility === 'public'}
+									/>
+								))}
 						</div>
 					</div>
 				</div>

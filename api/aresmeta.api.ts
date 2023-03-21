@@ -1,11 +1,13 @@
-import axios from 'axios';
-import GetConferencesQuery from './types/getConferences.query';
+'use client';
+import axios from 'lib/axios';
 
 class AresmetaApi {
 	private base_url: string;
 	constructor() {
-		this.base_url = 'https://aresmeta-back.sqkrv.com';
-		// this.base_url = 'http://localhost:3172';
+		this.base_url =
+			process.env.NODE_ENV === 'development'
+				? 'http://localhost:3172'
+				: 'https://aresmeta-back.sqkrv.com';
 	}
 
 	async createConference({
@@ -80,15 +82,8 @@ class AresmetaApi {
 				Authorization: `Bearer ${accessToken}`,
 			},
 		};
-		return await axios.post<string[]>(`${this.base_url}/file/upload`, formData, config);
-	}
 
-	async getConferences(query?: GetConferencesQuery) {
-		return await (
-			await fetch(`${this.base_url}/conferences?${new URLSearchParams(query as string)}`, {
-				cache: 'no-store',
-			})
-		).json();
+		return await axios.post<string[]>(`/file/upload`, formData, config);
 	}
 }
 

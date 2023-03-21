@@ -32,7 +32,6 @@ const UserList = ({ label, name, refValue }: IProps) => {
 	const [users, setUsers] = useState<{ email: string; id: string }[]>([]);
 
 	const handleClick = async () => {
-		console.log('first');
 		const res = await fetch(`https://aresmeta-back.sqkrv.com/users/${watch('useremail')}`, {
 			cache: 'no-store',
 			headers: {

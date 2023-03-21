@@ -3,6 +3,10 @@ import Providers from './Provider';
 export const metadata = {
 	title: 'Aresmeta',
 	description: 'Сайт для создания конференций',
+	icons: {
+		icon: '/favicon.png',
+		apple: '/apple-touch-icon.png',
+	},
 };
 
 interface IProps {

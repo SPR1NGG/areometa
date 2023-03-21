@@ -4,6 +4,15 @@ import DocLink from './DocLink';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 
+export const metadata = {
+	title: 'Aresmeta',
+	description: 'Сайт для создания конференций',
+	icons: {
+		icon: '/favicon.png',
+		apple: '/apple-touch-icon.png',
+	},
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<div className="grid grid-rows-[1fr,_auto] justify-items-center items-center min-h-screen py-8">

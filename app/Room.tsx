@@ -17,6 +17,7 @@ interface Props {
 
 const Room = ({ isPublic, name, datetime, id, creator }: Props) => {
 	const date = datetime.split('T')[0].split('-');
+	const time = datetime.split('T')[1].split('.')[0];
 	const session = useSession() as any;
 	const handleClick = async () => {
 		await AresmetaApi.removeConference({ id, token: session.data.user.accessToken });
@@ -27,7 +28,8 @@ const Room = ({ isPublic, name, datetime, id, creator }: Props) => {
 			<div className="flex flex-col gap-2">
 				<div className="flex items-center gap-2">
 					<BsFillCalendarCheckFill fill="#FFCC66" />
-					Дата проведения: {`${date[2]}.${date[1]}.${date[0]}`}
+					Дата проведения: {`${date[2]}.${date[1]}.${date[0]}`}{' '}
+					<span className="ml-1">{time.slice(0, -3)}</span>
 				</div>
 				<div className="flex items-center gap-2">
 					{isPublic ? (

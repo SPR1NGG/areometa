@@ -48,7 +48,7 @@ const PopupCreate = ({ setActive }: Props) => {
 			name: watch('name'),
 			images: uploadedImg.data,
 			visibility,
-			datetime,
+			datetime: new Date(datetime.setHours(datetime.getHours() + 3)),
 		});
 
 		setActive(false);
@@ -87,10 +87,15 @@ const PopupCreate = ({ setActive }: Props) => {
 				/>
 				<Select setVisibility={setVisibility} />
 				<DatePicker
-					locale="ru"
-					className="w-full border-t-blue-gray-200 text-blue-gray-700 rounded-lg"
 					selected={datetime}
 					onChange={(date) => date && setDatetime(date)}
+					locale="ru"
+					showTimeInput
+					timeFormat="p"
+					className="w-full border-t-blue-gray-200 text-blue-gray-700 rounded-lg"
+					dateFormat="Pp"
+					minDate={new Date()}
+					timeInputLabel="Время:"
 				/>
 				<input
 					type="file"
@@ -116,6 +121,7 @@ const PopupCreate = ({ setActive }: Props) => {
 					{images.length > 0 &&
 						images.map((img) => (
 							<img
+								key={img.name}
 								className="h-[100px] w-[100px] border border-black rounded-xl"
 								src={URL.createObjectURL(img)}
 							/>
