@@ -3,7 +3,7 @@ import aresmetaApi from 'api/aresmeta.api';
 import GetConferencesQuery from 'api/types/getConferences.query';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import IConference from 'types/conference.interface';
 import Filter, { ILabel } from './Filter';
 import Header from './Header';
@@ -12,6 +12,7 @@ import Room from './Room';
 const page = () => {
 	const [conferences, setConferences] = useState<IConference[]>([]);
 	const [query, setQuery] = useState<GetConferencesQuery>({});
+	const isFirstRun = useRef<boolean>(true);
 	const session = useSession();
 	const router = useRouter();
 	const typeLabels: ILabel[] = [
@@ -31,7 +32,9 @@ const page = () => {
 	}, [query]);
 
 	useEffect(() => {
-		if (!session.data?.user) {
+		console.log(session.data?.user);
+		if (!session.data?.user && !isFirstRun.current) {
+			isFirstRun.current = false
 			router.push('/auth');
 		}
 
