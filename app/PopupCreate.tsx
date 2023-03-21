@@ -1,16 +1,16 @@
 'use client';
 import Select from '@components/Select';
-import DatePicker, { registerLocale } from 'react-datepicker';
-import ru from 'date-fns/locale/ru';
 import { Button, Input } from '@material-tailwind/react';
-import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from 'react';
-import { RxCross2 } from 'react-icons/rx';
-import 'react-datepicker/dist/react-datepicker.css';
-import { useForm } from 'react-hook-form';
-import UserList from './UserList';
-import { useSession } from 'next-auth/react';
 import AresmetaApi from 'api/aresmeta.api';
 import { AxiosResponse } from 'axios';
+import ru from 'date-fns/locale/ru';
+import { useSession } from 'next-auth/react';
+import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from 'react';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { useForm } from 'react-hook-form';
+import { RxCross2 } from 'react-icons/rx';
+import UserList from './UserList';
 
 registerLocale('ru', ru);
 
@@ -19,18 +19,16 @@ interface Props {
 }
 
 type Inputs = {
-	file: File[];
 	name: string;
 };
 
 const PopupCreate = ({ setActive }: Props) => {
-	const session = useSession() as any;
+	const session = useSession();
 
 	const {
 		register,
 		handleSubmit,
 		watch,
-		reset,
 		formState: { errors },
 	} = useForm<Inputs>();
 	const [images, setImages] = useState<File[]>([]);
@@ -42,11 +40,11 @@ const PopupCreate = ({ setActive }: Props) => {
 	const onSubmit = async (data: Inputs) => {
 		const uploadedImg: AxiosResponse<string[]> = await AresmetaApi.uploadImages(
 			images,
-			session.data.user.accessToken,
+			session.data?.user.accessToken,
 		);
 
 		await AresmetaApi.createConference({
-			token: session.data.user.accessToken,
+			token: session.data?.user.accessToken,
 			name: watch('name'),
 			images: uploadedImg.data,
 			visibility,
@@ -95,7 +93,6 @@ const PopupCreate = ({ setActive }: Props) => {
 					onChange={(date) => date && setDatetime(date)}
 				/>
 				<input
-					{...register('file')}
 					type="file"
 					name="banner"
 					id="banner"

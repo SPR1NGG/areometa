@@ -17,7 +17,7 @@ class AresmetaApi {
 	}: {
 		name: string;
 		images: string[];
-		token: string;
+		token: string | undefined;
 		datetime: Date;
 		visibility: 'public' | 'private';
 	}) {
@@ -67,7 +67,7 @@ class AresmetaApi {
 		});
 	}
 
-	async uploadImages(images: File[], accessToken: string) {
+	async uploadImages(images: File[], accessToken: string | undefined) {
 		const formData = new FormData();
 
 		images.map((img) => {

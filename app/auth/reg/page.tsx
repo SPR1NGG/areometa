@@ -5,7 +5,7 @@ import TextBox from '@components/TextBox';
 import { ErrorMessage } from '@hookform/error-message';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { BsFillPersonFill } from 'react-icons/bs';
 import { FiMail } from 'react-icons/fi';
@@ -56,7 +56,7 @@ const page = () => {
 
 			toast.onChange((payload) => {
 				if (payload.status === 'removed' && payload.type === 'success') {
-					router.push('/auth');
+					router.push('auth');
 				}
 			});
 		}

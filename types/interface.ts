@@ -1,6 +1,6 @@
-export interface User {
-	name?: string | null | undefined;
-	id?: string;
-	email?: string;
-	accessToken?: string;
+export default interface User {
+	id: string;
+	email: string;
+	accessToken: string;
+	refreshToken: string;
 }

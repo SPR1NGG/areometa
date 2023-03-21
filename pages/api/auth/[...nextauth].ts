@@ -50,22 +50,11 @@ export const authOptions: NextAuthOptions = {
 			//  "token" is being send below to "session" callback...
 			//  ...so we set "user" param of "token" to object from "authorize"...
 			//  ...and return it...
-			if (user) {
-				token.email = user.email;
-				token.sub = user.id;
-			}
 
-			if (account) {
-				// @ts-ignore
-				token.accessToken = user.accessToken;
-			}
-
-			return token;
+			return { ...token, ...user };
 		},
 		async session({ session, token }) {
-			session.user.email = token.email;
-			session.user.id = token.sub;
-			session.user.accessToken = token.accessToken;
+			session.user = token as any;
 			return session;
 		},
 	},
