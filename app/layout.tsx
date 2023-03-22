@@ -11,12 +11,11 @@ export const metadata = {
 
 interface IProps {
 	children: React.ReactNode;
-	session: any;
 }
 
 export default function RootLayout({ children }: IProps) {
 	return (
-		<html lang="en">
+		<html lang="ru">
 			<body className="bg-[#F2F2ED]">
 				<Providers>{children}</Providers>
 			</body>

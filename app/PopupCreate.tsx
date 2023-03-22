@@ -10,6 +10,7 @@ import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useForm } from 'react-hook-form';
 import { RxCross2 } from 'react-icons/rx';
+import { useConferenceContext } from './Context/conference';
 import UserList from './UserList';
 
 registerLocale('ru', ru);
@@ -28,7 +29,6 @@ const PopupCreate = ({ setActive }: Props) => {
 	const {
 		register,
 		handleSubmit,
-		watch,
 		formState: { errors },
 	} = useForm<Inputs>();
 	const [images, setImages] = useState<File[]>([]);
@@ -36,6 +36,8 @@ const PopupCreate = ({ setActive }: Props) => {
 	const [visibility, setVisibility] = useState<'public' | 'private'>('public');
 	const listeners = useRef<{ email: string; id: string }[]>();
 	const speakers = useRef<{ email: string; id: string }[]>();
+
+	const { setConferences } = useConferenceContext();
 
 	const onSubmit = async (data: Inputs) => {
 		const uploadedImg: AxiosResponse<string[]> = await AresmetaApi.uploadImages(
@@ -45,11 +47,15 @@ const PopupCreate = ({ setActive }: Props) => {
 
 		await AresmetaApi.createConference({
 			token: session.data?.user.accessToken,
-			name: watch('name'),
+			name: data.name,
 			images: uploadedImg.data,
 			visibility,
 			datetime: new Date(datetime.setHours(datetime.getHours() + 3)),
 		});
+
+		const conferences = await AresmetaApi.getConferences();
+
+		setConferences(conferences.data);
 
 		setActive(false);
 	};

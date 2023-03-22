@@ -6,6 +6,7 @@ import { FaLock } from 'react-icons/fa';
 import { AiFillDelete } from 'react-icons/ai';
 import AresmetaApi from 'api/aresmeta.api';
 import { useSession } from 'next-auth/react';
+import { useConferenceContext } from './Context/conference';
 
 interface Props {
 	id: string;
@@ -18,9 +19,11 @@ interface Props {
 const Room = ({ isPublic, name, datetime, id, creator }: Props) => {
 	const date = datetime.split('T')[0].split('-');
 	const time = datetime.split('T')[1].split('.')[0];
-	const session = useSession() as any;
+	const {setConferences} = useConferenceContext()
+	const session = useSession();
 	const handleClick = async () => {
-		await AresmetaApi.removeConference({ id, token: session.data.user.accessToken });
+		await AresmetaApi.removeConference(id);
+		AresmetaApi.getConferences().then((data) => setConferences(data.data));
 	};
 
 	return (

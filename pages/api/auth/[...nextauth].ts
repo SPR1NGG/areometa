@@ -3,6 +3,10 @@ import NextAuth from 'next-auth';
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
+function parseJwt(token: string) {
+	return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+}
+
 export const authOptions: NextAuthOptions = {
 	// Configure one or more authentication providers
 	providers: [
@@ -40,6 +44,18 @@ export const authOptions: NextAuthOptions = {
 			//  "token" is being send below to "session" callback...
 			//  ...so we set "user" param of "token" to object from "authorize"...
 			//  ...and return it...
+
+			if (token.accessToken) {
+				const decoded = parseJwt(token.accessToken as string);
+				if (Date.now() >= decoded.exp * 1000) {
+					const res = await axios.post('/auth/refresh', {
+						refreshToken: token.refreshToken,
+					});
+
+					token.accessToken = res.data.accessToken;
+					token.refreshToken = res.data.refreshToken;
+				}
+			}
 
 			return { ...token, ...user };
 		},

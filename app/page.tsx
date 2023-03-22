@@ -1,27 +1,28 @@
 'use client';
-import aresmetaApi from 'api/aresmeta.api';
+import AresmetaApi from 'api/aresmeta.api';
 import GetConferencesQuery from 'api/types/getConferences.query';
 import useAxiosAuth from 'lib/hooks/useAxiosAuth';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import IConference from 'types/conference.interface';
+import { useConferenceContext } from './Context/conference';
 import Filter, { ILabel } from './Filter';
 import Header from './Header';
 import Room from './Room';
 
 const page = () => {
-	const [conferences, setConferences] = useState<IConference[]>([]);
 	const [query, setQuery] = useState<GetConferencesQuery>({});
+	const { conferences, setConferences } = useConferenceContext();
 	const session = useSession();
 	const router = useRouter();
-	const axiosAuth = useAxiosAuth();
 
 	const typeLabels: ILabel[] = [
 		{ label: 'Все', value: 'all' },
 		{ label: 'Открытые', value: 'public' },
 		{ label: 'Закрытые', value: 'private' },
 	];
+
 	const timeLabels: ILabel[] = [
 		{ label: 'Все', value: 'all' },
 		{ label: 'Сегодня', value: 'today' },
@@ -30,21 +31,16 @@ const page = () => {
 	];
 
 	useEffect(() => {
-		console.log(session);
 		if (session.status === 'unauthenticated') {
 			router.push('/auth');
 		} else {
-			axiosAuth.get('/conferences').then((data) => setConferences(data.data));
+			AresmetaApi.getConferences().then((data) => setConferences(data.data));
 		}
 	}, [session.status]);
 
 	useEffect(() => {
 		if (session.status === 'authenticated') {
-			axiosAuth
-				.get('/conferences', {
-					params: query,
-				})
-				.then((data) => setConferences(data.data));
+			AresmetaApi.getConferences(query).then((data) => setConferences(data.data));
 		}
 	}, [query]);
 

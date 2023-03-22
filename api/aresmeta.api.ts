@@ -1,63 +1,40 @@
 'use client';
-import axios from 'lib/axios';
+import { $api } from 'api';
+import axios, { BASE_URL } from 'lib/axios';
+import createConferenceDto from './types/createConferenceDto';
+import GetConferencesQuery from './types/getConferences.query';
 
-class AresmetaApi {
-	private base_url: string;
-	constructor() {
-		this.base_url =
-			process.env.NODE_ENV === 'development'
-				? 'http://localhost:3172'
-				: 'https://aresmeta-back.sqkrv.com';
-	}
+const base_url = BASE_URL;
 
-	async createConference({
-		token,
-		name,
-		images,
-		datetime,
-		visibility,
-	}: {
-		name: string;
-		images: string[];
-		token: string | undefined;
-		datetime: Date;
-		visibility: 'public' | 'private';
-	}) {
-		await fetch(`${this.base_url}/conferences`, {
-			method: 'POST',
-			cache: 'no-store',
-			headers: {
-				Authorization: `Bearer ${token}`,
-				'Content-type': 'application/json',
-			},
-			body: JSON.stringify({
-				name,
-				datetime: datetime,
-				visibility: visibility,
-				media_file: images.map((img) => ({ filename: img })),
-			}),
+export default class AresmetaApi {
+	static async createConference({ name, images, datetime, visibility }: createConferenceDto) {
+		return $api.post(`/conferences`, {
+			name,
+			datetime: datetime,
+			visibility: visibility,
+			media_file: images.map((img) => ({ filename: img })),
 		});
 	}
 
-	async removeConference({ token, id }: { token: string; id: string }) {
-		await fetch(`${this.base_url}/conferences/${id}`, {
-			method: 'DELETE',
-			cache: 'no-store',
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
+	static async getConferences(query?: GetConferencesQuery) {
+		return $api.get('/conferences', {
+			params: query,
 		});
 	}
 
-	async sendResetEmail(email: string) {
-		await fetch(this.base_url + `/auth/reset/${email}`, {
+	static async removeConference(id: string) {
+		await $api.delete(`/conferences/${id}`);
+	}
+
+	static async sendResetEmail(email: string) {
+		await fetch(base_url + `/auth/reset/${email}`, {
 			method: 'POST',
 			cache: 'no-store',
 		});
 	}
 
-	async reset(token: string, newPass: string) {
-		await fetch(this.base_url + `/auth/reset?token=${token}`, {
+	static async reset(token: string, newPass: string) {
+		await fetch(base_url + `/auth/reset?token=${token}`, {
 			method: 'POST',
 			cache: 'no-store',
 			headers: {
@@ -69,7 +46,7 @@ class AresmetaApi {
 		});
 	}
 
-	async uploadImages(images: File[], accessToken: string | undefined) {
+	static async uploadImages(images: File[], accessToken: string | undefined) {
 		const formData = new FormData();
 
 		images.map((img) => {
@@ -86,5 +63,3 @@ class AresmetaApi {
 		return await axios.post<string[]>(`/file/upload`, formData, config);
 	}
 }
-
-export default new AresmetaApi();

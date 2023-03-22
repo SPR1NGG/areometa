@@ -18,9 +18,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 					<DocLink>пользовательское соглашение</DocLink>
 				</div>
 				<div className="flex justify-center items-center gap-4">
-					<Image src={'/logo.png'} alt="логотип" width={74} height={43} />
+					<Image priority src={'/logo.png'} alt="логотип" width={74} height={43} />
 					<p>Разработано с помощью технологии Aresmeta</p>
-					<Image src={'/metaworld.png'} alt="метамир" width={166} height={42} />
+					<Image priority src={'/metaworld.png'} alt="метамир" width={166} height={42} />
 				</div>
 			</div>
 			<ToastContainer

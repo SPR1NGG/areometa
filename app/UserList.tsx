@@ -18,8 +18,8 @@ interface IProps {
 		| undefined;
 }
 
-const UserList = ({ label, name, refValue }: IProps) => {
-	const session = useSession() as any;
+const UserList = ({ label, refValue }: IProps) => {
+	const session = useSession();
 
 	const {
 		register,
@@ -35,7 +35,7 @@ const UserList = ({ label, name, refValue }: IProps) => {
 		const res = await fetch(`https://aresmeta-back.sqkrv.com/users/${watch('useremail')}`, {
 			cache: 'no-store',
 			headers: {
-				Authorization: `Bearer ${session.data.user.accessToken}`,
+				Authorization: `Bearer ${session.data?.user.accessToken}`,
 			},
 		});
 		const user = await res.json();
@@ -57,7 +57,7 @@ const UserList = ({ label, name, refValue }: IProps) => {
 						onClick={() =>
 							setUsers((old) => [
 								...old,
-								{ email: session.data.user.email, id: session.data.user.id },
+								{ email: session.data!.user.email, id: session.data!.user.id },
 							])
 						}
 						onResizeCapture={undefined}

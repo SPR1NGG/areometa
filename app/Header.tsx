@@ -14,7 +14,7 @@ const Header = () => {
 	return (
 		<div className="bg-white shadow flex justify-between items-center px-8 p-4">
 			<div className="flex gap-4 items-center">
-				<Image alt="логотип" src="/logo.png" width={140} height={70}></Image>
+				<Image priority alt="логотип" src="/logo.png" width="140" height="70" />
 				<Button onClick={() => setActive(true)}>Создать конференцию</Button>
 				<Link
 					className="bg-[linear-gradient(93deg,#E86605,#FCDF00)] text-white font-medium rounded-xl px-8 py-4"

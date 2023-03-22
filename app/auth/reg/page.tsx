@@ -72,7 +72,7 @@ const page = () => {
 	return (
 		<div className="bg-[linear-gradient(#E86604,#FCDE00)] w-[600px] p-[1px] rounded-2xl mb-16">
 			<form className="bg-white rounded-2xl px-16 py-10 flex flex-col gap-8">
-				<Image className="mx-auto" src="/logo.png" alt="Логотип" width={250} height={144} />
+				<Image priority className="mx-auto" src="/logo.png" alt="Логотип" width={250} height={144} />
 				<p className="text-xl font-medium text-center">Регистрация</p>
 				<div>
 					<TextBox
