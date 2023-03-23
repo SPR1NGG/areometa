@@ -1,7 +1,6 @@
 'use client';
 import Image from 'next/image';
 import DocLink from './DocLink';
-import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

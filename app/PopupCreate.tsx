@@ -1,15 +1,19 @@
 'use client';
+import FileInput from '@components/FileInput';
+import ImageList from '@components/ImageList';
 import Select from '@components/Select';
+import { ErrorMessage } from '@hookform/error-message';
 import { Button, Input } from '@material-tailwind/react';
-import AresmetaApi from 'api/aresmeta.api';
+import ConferenceService from 'api/services/ConferenceService';
+import { ConferenceMember, RoleEnum } from 'api/types/createConferenceDto';
 import { AxiosResponse } from 'axios';
 import ru from 'date-fns/locale/ru';
-import { useSession } from 'next-auth/react';
-import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useForm } from 'react-hook-form';
 import { RxCross2 } from 'react-icons/rx';
+import { toast, ToastContainer } from 'react-toastify';
 import { useConferenceContext } from './Context/conference';
 import UserList from './UserList';
 
@@ -24,50 +28,55 @@ type Inputs = {
 };
 
 const PopupCreate = ({ setActive }: Props) => {
-	const session = useSession();
-
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<Inputs>();
 	const [images, setImages] = useState<File[]>([]);
+	const [banner, setBanner] = useState<File[]>([]);
 	const [datetime, setDatetime] = useState<Date>(new Date());
-	const [visibility, setVisibility] = useState<'public' | 'private'>('public');
-	const listeners = useRef<{ email: string; id: string }[]>();
-	const speakers = useRef<{ email: string; id: string }[]>();
+	const [visibility, setVisibility] = useState<'public' | 'private'>();
+	const [listeners, setListeners] = useState<ConferenceMember[]>([]);
+	const [speakers, setSpeakers] = useState<ConferenceMember[]>([]);
 
 	const { setConferences } = useConferenceContext();
 
 	const onSubmit = async (data: Inputs) => {
-		const uploadedImg: AxiosResponse<string[]> = await AresmetaApi.uploadImages(
-			images,
-			session.data?.user.accessToken,
-		);
+		if (images.length === 0) {
+			toast.error('Загрузите слайды');
+			return;
+		}
 
-		await AresmetaApi.createConference({
-			token: session.data?.user.accessToken,
+		if (
+			((listeners.length === 0 || speakers.length === 0) && visibility === 'private') ||
+			(visibility === 'public' && speakers.length === 0)
+		) {
+			toast.error('Укажите участников');
+			return;
+		}
+
+		if (visibility === undefined) {
+			toast.error('Укажите тип конференции');
+			return;
+		}
+
+		const uploadedImg: AxiosResponse<string[]> = await ConferenceService.uploadImages(images);
+		const bannerImg: AxiosResponse<string[]> = await ConferenceService.uploadImages(banner);
+
+		await ConferenceService.create({
 			name: data.name,
 			images: uploadedImg.data,
 			visibility,
+			bannerFilename: bannerImg.data[0],
 			datetime: new Date(datetime.setHours(datetime.getHours() + 3)),
+			conferenceMember: [...listeners, ...speakers],
 		});
 
-		const conferences = await AresmetaApi.getConferences();
-
-		setConferences(conferences.data);
+		const conferences = await ConferenceService.get();
+		setConferences(conferences.data.conferences);
 
 		setActive(false);
-	};
-
-	const handleMultipleImages = (e: ChangeEvent<HTMLInputElement>) => {
-		const selectedFiles: string[] = [];
-		const targetFiles: File[] = Array.from(e.target.files!);
-		const targetFilesObject: File[] = [...targetFiles];
-		targetFilesObject.map((file) => {
-			return selectedFiles.push(URL.createObjectURL(file));
-		});
-		setImages(targetFiles);
 	};
 
 	return (
@@ -85,12 +94,13 @@ const PopupCreate = ({ setActive }: Props) => {
 				<RxCross2 onClick={() => setActive(false)} className="self-end cursor-pointer" />
 				<Input
 					color="amber"
+					autoComplete="off"
 					label="Название коференции"
-					nonce={undefined}
-					onResize={undefined}
-					onResizeCapture={undefined}
-					{...register('name')}
+					{...register('name', {
+						required: 'Это поле обязательно',
+					})}
 				/>
+				<ErrorMessage className="error" errors={errors} as="p" name="name" />
 				<Select setVisibility={setVisibility} />
 				<DatePicker
 					selected={datetime}
@@ -103,49 +113,42 @@ const PopupCreate = ({ setActive }: Props) => {
 					minDate={new Date()}
 					timeInputLabel="Время:"
 				/>
-				<input
-					type="file"
-					name="banner"
-					id="banner"
-					className="inputfile"
-					onChange={(e) => handleMultipleImages(e)}
-					multiple
-					accept="image/jpeg, image/png, image/jpg"
+				<FileInput setImages={setBanner} name="banner" isMultiple={true}>
+					Загрузить баннер
+				</FileInput>
+				<ImageList images={banner} />
+				<UserList
+					label="Слушатели"
+					name={RoleEnum.attendee}
+					users={speakers}
+					setUsers={setSpeakers}
 				/>
-				<label htmlFor="banner" className="cursor-pointer">
-					<Button
-						className="text-white"
-						color="amber"
-						nonce={undefined}
-						onResize={undefined}
-						onResizeCapture={undefined}
-					>
-						Загрузить картинки
-					</Button>
-				</label>
-				<div className="flex gap-2">
-					{images.length > 0 &&
-						images.map((img) => (
-							<img
-								key={img.name}
-								className="h-[100px] w-[100px] border border-black rounded-xl"
-								src={URL.createObjectURL(img)}
-							/>
-						))}
-				</div>
-				<UserList label="Спикеры" name="speak" />
-				<UserList label="Слушатели" name="list" />
-				<Button
-					color="amber"
-					type="submit"
-					className="text-white"
-					nonce={undefined}
-					onResize={undefined}
-					onResizeCapture={undefined}
-				>
+				<UserList
+					label="Спикеры"
+					name={RoleEnum.speaker}
+					users={listeners}
+					setUsers={setListeners}
+				/>
+				<FileInput setImages={setImages} name="images">
+					Загрузить слайды
+				</FileInput>
+				<ImageList images={images} />
+				<Button color="amber" type="submit" className="text-white">
 					Создать конференцию
 				</Button>
 			</form>
+			<ToastContainer
+				position="bottom-left"
+				autoClose={2500}
+				hideProgressBar={false}
+				newestOnTop={false}
+				pauseOnFocusLoss={false}
+				closeOnClick
+				rtl={false}
+				draggable
+				pauseOnHover
+				theme="light"
+			/>
 		</div>
 	);
 };

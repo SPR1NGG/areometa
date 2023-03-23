@@ -1,21 +1,23 @@
 'use client';
-import AresmetaApi from 'api/aresmeta.api';
+import ConferenceService from 'api/services/ConferenceService';
 import GetConferencesQuery from 'api/types/getConferences.query';
-import useAxiosAuth from 'lib/hooks/useAxiosAuth';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import IConference from 'types/conference.interface';
+import ReactPaginate from 'react-paginate';
 import { useConferenceContext } from './Context/conference';
 import Filter, { ILabel } from './Filter';
 import Header from './Header';
 import Room from './Room';
+import 'react-toastify/dist/ReactToastify.css';
 
 const page = () => {
 	const [query, setQuery] = useState<GetConferencesQuery>({});
 	const { conferences, setConferences } = useConferenceContext();
 	const session = useSession();
 	const router = useRouter();
+	const step = 5;
+	const total = useRef(0);
 
 	const typeLabels: ILabel[] = [
 		{ label: 'Все', value: 'all' },
@@ -34,22 +36,29 @@ const page = () => {
 		if (session.status === 'unauthenticated') {
 			router.push('/auth');
 		} else {
-			AresmetaApi.getConferences().then((data) => setConferences(data.data));
+			ConferenceService.get().then((data) => setConferences(data.data.conferences));
 		}
 	}, [session.status]);
 
 	useEffect(() => {
 		if (session.status === 'authenticated') {
-			AresmetaApi.getConferences(query).then((data) => setConferences(data.data));
+			ConferenceService.get(query).then(({ data }) => {
+				setConferences(data.conferences);
+				total.current = data.total;
+			});
 		}
 	}, [query]);
+
+	const handlePageClick = (event: { selected: number }) => {
+		setQuery((prev) => ({ ...prev, limit: step, offset: event.selected * step }));
+	};
 
 	if (session?.data?.user) {
 		return (
 			<div className="grid h-screen grid-rows-[100px,1fr]">
 				<Header />
 				<div className="grid grid-cols-1 h-full container mx-auto">
-					<div className="p-4 grid grid-rows-[auto,1fr] gap-4 max-h-[calc(100vh_-_100px)]">
+					<div className="p-4 flex flex-col gap-4 max-h-[calc(100vh_-_100px)]">
 						<div className="bg-white rounded-xl">
 							<Filter
 								filterLabels={typeLabels}
@@ -62,17 +71,25 @@ const page = () => {
 						</div>
 						<div className="flex flex-col gap-4 overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-600 scrollbar-thumb-rounded">
 							{conferences.length > 0 &&
-								conferences.map(({ name, datetime, id, visibility, creator }) => (
-									<Room
-										name={name}
-										id={id}
-										datetime={datetime}
-										key={id}
-										creator={creator}
-										isPublic={visibility === 'public'}
-									/>
-								))}
+								conferences.map((conference) => <Room key={conference.id} {...conference} />)}
 						</div>
+						{Math.ceil(total.current / step) > 1 && (
+							<ReactPaginate
+								className="flex gap-2 mx-auto"
+								pageLinkClassName="bg-white shadow rounded block text-center px-1 h-[24px] min-w-[24px]"
+								nextLinkClassName="bg-white shadow rounded block h-[24px] select-none px-2"
+								previousLinkClassName="bg-white shadow rounded block select-none h-[24px] px-2"
+								disabledClassName="opacity-50"
+								activeLinkClassName="active"
+								previousLabel="Назад"
+								nextLabel="Вперёд"
+								breakLabel={null}
+								pageRangeDisplayed={2}
+								marginPagesDisplayed={1}
+								onPageChange={handlePageClick}
+								pageCount={Math.ceil(total.current / step)}
+							/>
+						)}
 					</div>
 				</div>
 			</div>

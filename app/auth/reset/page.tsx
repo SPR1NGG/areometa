@@ -2,12 +2,14 @@
 import Button from '@components/Button';
 import TextBox from '@components/TextBox';
 import { ErrorMessage } from '@hookform/error-message';
-import AresmetaApi from 'api/aresmeta.api';
+import UserService from 'api/services/UserService';
+import { AxiosError } from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { FiMail } from 'react-icons/fi';
-import { toast } from 'react-toastify';
+import { toast, ToastContentProps } from 'react-toastify';
+import ErrorResponse from 'types/errorResponse';
 
 type Inputs = {
 	email: string;
@@ -17,15 +19,21 @@ const page = () => {
 	const {
 		register,
 		handleSubmit,
-		watch,
 		reset,
 		formState: { errors },
 	} = useForm<Inputs>();
 
-	const onSubmit = async () => {
-		await AresmetaApi.sendResetEmail(watch('email'));
+	const onSubmit = async (data: Inputs) => {
+		toast.promise(UserService.sendResetEmail(data.email), {
+			success: 'Ссылка отправлена на вашу почту',
+			error: {
+				render({ data }: ToastContentProps<AxiosError<ErrorResponse>>) {
+					return data?.response?.data.message;
+				},
+			},
+		});
+
 		reset({ email: '' });
-		toast.success('Ссылка отправлена на вашу почту');
 	};
 
 	return (

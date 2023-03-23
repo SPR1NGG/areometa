@@ -1,5 +1,5 @@
 import '../styles/globals.css';
-import Providers from './Provider';
+import Providers from './Providers';
 export const metadata = {
 	title: 'Aresmeta',
 	description: 'Сайт для создания конференций',

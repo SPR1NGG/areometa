@@ -1,3 +1,9 @@
+export interface MediaFile {
+	id: string;
+	conference_id: string;
+	filename: string;
+}
+
 export default interface IConference {
 	id: string;
 	name: string;
@@ -5,6 +11,9 @@ export default interface IConference {
 	visibility: 'public' | 'private';
 	banner_filename: string;
 	creator: string;
-	media_file: [[Object], [Object]];
+	user: {
+		name: string;
+	};
+	media_file: MediaFile[];
 	conference_member: [[Object]];
 }

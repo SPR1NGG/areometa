@@ -1,6 +1,6 @@
 export default interface GetConferencesQuery {
-	offset?: string;
-	limit?: string;
+	offset?: number;
+	limit?: number;
 	visibility?: 'public' | 'private';
 	datetime?: 'today' | 'tomorrow' | 'past';
 }

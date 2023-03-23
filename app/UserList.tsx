@@ -1,47 +1,37 @@
 import { Button, Input } from '@material-tailwind/react';
+import UserService from 'api/services/UserService';
+import { ConferenceMember, RoleEnum } from 'api/types/createConferenceDto';
 import { useSession } from 'next-auth/react';
-import React, { MutableRefObject, useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { useForm } from 'react-hook-form';
 
 type Inputs = {
-	useremail: string;
+	[key: string]: string;
 };
 
 interface IProps {
 	label: string;
-	name: string;
-	refValue?:
-		| MutableRefObject<{
-				email: string;
-				id: string;
-		  }>[]
-		| undefined;
+	name: RoleEnum;
+	users: ConferenceMember[];
+	setUsers: Dispatch<SetStateAction<ConferenceMember[]>>;
 }
 
-const UserList = ({ label, refValue }: IProps) => {
-	const session = useSession();
+const UserList = ({ label, name, users, setUsers }: IProps) => {
+	const { data: session } = useSession();
 
 	const {
 		register,
 		handleSubmit,
-		watch,
 		reset,
 		formState: { errors },
 	} = useForm<Inputs>();
 
-	const [users, setUsers] = useState<{ email: string; id: string }[]>([]);
-
-	const handleClick = async () => {
-		const res = await fetch(`https://aresmeta-back.sqkrv.com/users/${watch('useremail')}`, {
-			cache: 'no-store',
-			headers: {
-				Authorization: `Bearer ${session.data?.user.accessToken}`,
-			},
-		});
-		const user = await res.json();
-		setUsers((old) => [...old, { email: user.email, id: user.id }]);
-		refValue?.push();
-		reset({ useremail: '' });
+	const handleClick = async (data: Inputs) => {
+		const {
+			data: { email, id },
+		} = await UserService.userByEmail(data[name]);
+		setUsers((old) => [...old, { email, role: name, user_id: id }]);
+		reset({ [name]: '' });
 	};
 
 	return (
@@ -57,7 +47,7 @@ const UserList = ({ label, refValue }: IProps) => {
 						onClick={() =>
 							setUsers((old) => [
 								...old,
-								{ email: session.data!.user.email, id: session.data!.user.id },
+								{ email: session!.user.email, user_id: session!.user.id, role: name },
 							])
 						}
 						onResizeCapture={undefined}
@@ -70,14 +60,14 @@ const UserList = ({ label, refValue }: IProps) => {
 						nonce={undefined}
 						onResize={undefined}
 						onResizeCapture={undefined}
-						{...register('useremail')}
+						{...register(name)}
 					/>
 					<Button
 						nonce={undefined}
 						color="amber"
 						className="text-white w-max"
 						onResize={undefined}
-						onClick={handleClick}
+						onClick={handleSubmit(handleClick)}
 						onResizeCapture={undefined}
 					>
 						Добавить
@@ -85,13 +75,11 @@ const UserList = ({ label, refValue }: IProps) => {
 				</div>
 
 				<div className="flex gap-2">
-					{users.map((user) => {
-						return (
-							<span className="bg-gray-200 rounded-xl p-2" key={user.id}>
-								{user.email}
-							</span>
-						);
-					})}
+					{users.map((user) => (
+						<span className="bg-gray-200 rounded-xl p-2" key={user.user_id}>
+							{user.email}
+						</span>
+					))}
 				</div>
 			</div>
 		</div>
