@@ -1,7 +1,7 @@
-import { $api } from 'api';
-import createConferenceDto from 'api/types/createConferenceDto';
-import GetConferences from 'api/types/getConferences';
-import GetConferencesQuery from 'api/types/getConferences.query';
+import $api from 'api';
+import createConferenceDto from './types/createConferenceDto';
+import GetConferences from './types/getConferences';
+import GetConferencesQuery from './types/getConferences.query';
 import { AxiosResponse } from 'axios';
 
 export default class ConferenceService {
@@ -14,6 +14,20 @@ export default class ConferenceService {
 		bannerFilename,
 	}: createConferenceDto) {
 		return $api.post(`/conferences`, {
+			name,
+			datetime: datetime,
+			visibility: visibility,
+			banner_filename: bannerFilename,
+			media_file: images.map((img) => ({ filename: img })),
+			conference_member: conferenceMember.map(({ email, ...user }) => user),
+		});
+	}
+
+	static async update(
+		{ name, images, datetime, visibility, conferenceMember, bannerFilename }: createConferenceDto,
+		id: string,
+	) {
+		return $api.patch(`/conferences/${id}`, {
 			name,
 			datetime: datetime,
 			visibility: visibility,

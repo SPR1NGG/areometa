@@ -76,3 +76,6 @@ input.react-datepicker-time__input {
 	background: #ffbf00;
 	color: white;
 }
+button[type='submit'] {
+	overflow: initial !important;
+}

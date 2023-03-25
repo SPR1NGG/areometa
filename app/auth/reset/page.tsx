@@ -2,7 +2,7 @@
 import Button from '@components/Button';
 import TextBox from '@components/TextBox';
 import { ErrorMessage } from '@hookform/error-message';
-import UserService from 'api/services/UserService';
+import UserService from 'api/services/userService';
 import { AxiosError } from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -26,6 +26,7 @@ const page = () => {
 	const onSubmit = async (data: Inputs) => {
 		toast.promise(UserService.sendResetEmail(data.email), {
 			success: 'Ссылка отправлена на вашу почту',
+			pending: 'Отправка письма',
 			error: {
 				render({ data }: ToastContentProps<AxiosError<ErrorResponse>>) {
 					return data?.response?.data.message;
@@ -38,7 +39,7 @@ const page = () => {
 
 	return (
 		<div className="bg-[linear-gradient(#E86604,#FCDE00)] w-[500px] p-[1px] rounded-2xl mb-16">
-			<div className="bg-white rounded-2xl px-16 py-10 flex flex-col gap-8">
+			<form className="bg-white rounded-2xl px-16 py-10 flex flex-col gap-8">
 				<Image
 					priority
 					className="mx-auto"
@@ -64,11 +65,13 @@ const page = () => {
 					/>
 					<ErrorMessage className="error" errors={errors} as="p" name="email" />
 				</div>
-				<Button onClick={handleSubmit(onSubmit)}>Сбросить пароль</Button>
+				<Button type="submit" onClick={handleSubmit(onSubmit)}>
+					Сбросить пароль
+				</Button>
 				<div className="text-center gap-16 font-medium">
 					<Link href={'auth'}>Авторизоваться</Link>
 				</div>
-			</div>
+			</form>
 		</div>
 	);
 };

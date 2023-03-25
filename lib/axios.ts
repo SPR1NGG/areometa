@@ -8,6 +8,8 @@ export default axios.create({
 	headers: { 'Content-Type': 'application/json' },
 });
 
+export const UPLOAD_URL = `${BASE_URL}/uploads/`;
+
 export const axiosAuth = axios.create({
 	baseURL: BASE_URL,
 	headers: { 'Content-Type': 'application/json' },

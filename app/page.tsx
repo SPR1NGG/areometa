@@ -1,6 +1,6 @@
 'use client';
 import ConferenceService from 'api/services/ConferenceService';
-import GetConferencesQuery from 'api/types/getConferences.query';
+import GetConferencesQuery from 'api/services/conferenceService/types/getConferences.query';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -9,14 +9,13 @@ import { useConferenceContext } from './Context/conference';
 import Filter, { ILabel } from './Filter';
 import Header from './Header';
 import Room from './Room';
-import 'react-toastify/dist/ReactToastify.css';
 
 const page = () => {
-	const [query, setQuery] = useState<GetConferencesQuery>({});
+	const [query, setQuery] = useState<GetConferencesQuery>();
 	const { conferences, setConferences } = useConferenceContext();
 	const session = useSession();
 	const router = useRouter();
-	const step = 5;
+	const step = 10;
 	const total = useRef(0);
 
 	const typeLabels: ILabel[] = [
@@ -41,7 +40,7 @@ const page = () => {
 	}, [session.status]);
 
 	useEffect(() => {
-		if (session.status === 'authenticated') {
+		if (session.status === 'authenticated' && query) {
 			ConferenceService.get(query).then(({ data }) => {
 				setConferences(data.conferences);
 				total.current = data.total;

@@ -10,7 +10,7 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const TextBox = ({ Icon, useForm, ...props }: Props) => {
-	const [visible, setVisible] = useState<'password' | 'text' | false>(false);
+	const [visible, setVisible] = useState<'text' | false>(false);
 	const spread = (useForm && useForm()) || {};
 
 	return (
@@ -26,15 +26,13 @@ const TextBox = ({ Icon, useForm, ...props }: Props) => {
 				{props.type === 'password' && visible === false && (
 					<AiOutlineEye
 						className="w-[20px] h-[20px] cursor-pointer"
-						onMouseDown={() => setVisible('text')}
-						onMouseUp={() => setVisible(false)}
+						onClick={() => setVisible((prev) => (prev === 'text' ? false : 'text'))}
 					/>
 				)}
 				{props.type === 'password' && visible === 'text' && (
 					<AiOutlineEyeInvisible
 						className="w-[20px] h-[20px] cursor-pointer"
-						onMouseDown={() => setVisible('text')}
-						onMouseUp={() => setVisible(false)}
+						onClick={() => setVisible((prev) => (prev === 'text' ? false : 'text'))}
 					/>
 				)}
 			</div>

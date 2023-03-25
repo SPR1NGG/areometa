@@ -11,12 +11,15 @@ import {
 } from 'api/services/conferenceService/types/createConferenceDto';
 import { AxiosResponse } from 'axios';
 import ru from 'date-fns/locale/ru';
+import { UPLOAD_URL } from 'lib/axios';
+import Image from 'next/image';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useForm } from 'react-hook-form';
 import { RxCross2 } from 'react-icons/rx';
 import { toast, ToastContainer } from 'react-toastify';
+import IConference from 'types/conference.interface';
 import { useConferenceContext } from './Context/conference';
 import UserList from './UserList';
 
@@ -24,13 +27,14 @@ registerLocale('ru', ru);
 
 interface Props {
 	setActive: Dispatch<SetStateAction<boolean>>;
+	conference: IConference;
 }
 
 type Inputs = {
 	name: string;
 };
 
-const PopupCreate = ({ setActive }: Props) => {
+const PopupEdit = ({ setActive, conference }: Props) => {
 	const {
 		register,
 		handleSubmit,
@@ -38,9 +42,17 @@ const PopupCreate = ({ setActive }: Props) => {
 	} = useForm<Inputs>();
 	const [images, setImages] = useState<File[]>([]);
 	const [banner, setBanner] = useState<File[]>([]);
-	const [datetime, setDatetime] = useState<Date>(new Date());
-	const [visibility, setVisibility] = useState<'public' | 'private'>();
-	const [conferenceMembers, setConferenceMembers] = useState<ConferenceMember[]>([]);
+	const [datetime, setDatetime] = useState<Date>(new Date(conference.datetime));
+	const [visibility, setVisibility] = useState<'public' | 'private' | undefined>(
+		conference.visibility,
+	);
+	const [conferenceMembers, setConferenceMembers] = useState<ConferenceMember[]>(
+		conference.conference_member.map((user) => ({
+			role: user.role,
+			user_id: user.user_id,
+			email: user.user.email,
+		})),
+	);
 
 	const { setConferences } = useConferenceContext();
 
@@ -59,18 +71,13 @@ const PopupCreate = ({ setActive }: Props) => {
 	}, []);
 
 	const onSubmit = async (data: Inputs) => {
-		const listeners = conferenceMembers.filter((member) => member.role === RoleEnum.attendee);
-		const speakers = conferenceMembers.filter((member) => member.role === RoleEnum.speaker);
-
 		if (datetime.getTime() < new Date().getTime() - (new Date().getSeconds() + 1) * 1000) {
 			toast.error('Нельзя создавать конференции в прошлом времени');
 			return;
 		}
 
-		if (images.length === 0) {
-			toast.error('Загрузите слайды');
-			return;
-		}
+		const listeners = conferenceMembers.filter((member) => member.role === RoleEnum.attendee);
+		const speakers = conferenceMembers.filter((member) => member.role === RoleEnum.speaker);
 
 		if (
 			((listeners.length === 0 || speakers.length === 0) && visibility === 'private') ||
@@ -88,14 +95,17 @@ const PopupCreate = ({ setActive }: Props) => {
 		const uploadedImg: AxiosResponse<string[]> = await ConferenceService.uploadImages(images);
 		const bannerImg: AxiosResponse<string[]> = await ConferenceService.uploadImages(banner);
 
-		await ConferenceService.create({
-			name: data.name,
-			images: uploadedImg.data,
-			visibility,
-			bannerFilename: bannerImg.data[0],
-			datetime: new Date(datetime.setHours(datetime.getHours() + 3)),
-			conferenceMember: [...listeners, ...speakers],
-		});
+		await ConferenceService.update(
+			{
+				name: data.name,
+				images: uploadedImg.data,
+				visibility,
+				bannerFilename: bannerImg.data[0],
+				datetime: new Date(datetime.setHours(datetime.getHours() + 3)),
+				conferenceMember: [...listeners, ...speakers],
+			},
+			conference.id,
+		);
 
 		const conferences = await ConferenceService.get();
 		setConferences(conferences.data.conferences);
@@ -119,13 +129,14 @@ const PopupCreate = ({ setActive }: Props) => {
 				<Input
 					color="amber"
 					autoComplete="off"
+					defaultValue={conference.name}
 					label="Название коференции"
 					{...register('name', {
 						required: 'Это поле обязательно',
 					})}
 				/>
 				<ErrorMessage className="error" errors={errors} as="p" name="name" />
-				<Select setVisibility={setVisibility} />
+				<Select visibility={conference.visibility} setVisibility={setVisibility} />
 				<DatePicker
 					selected={datetime}
 					onChange={(date) => date && setDatetime(date)}
@@ -140,7 +151,16 @@ const PopupCreate = ({ setActive }: Props) => {
 				<FileInput setImages={setBanner} name="banner" isMultiple={false}>
 					Загрузить баннер
 				</FileInput>
-				<ImageList images={banner} />
+				{banner.length === 0 && conference.banner_filename ? (
+					<Image
+						alt="баннер"
+						src={`${UPLOAD_URL}${conference.banner_filename}`}
+						height={68}
+						width={120}
+					/>
+				) : (
+					<ImageList images={banner} />
+				)}
 				<UserList
 					label="Спикеры"
 					name={RoleEnum.speaker}
@@ -156,9 +176,9 @@ const PopupCreate = ({ setActive }: Props) => {
 				<FileInput setImages={setImages} name="images">
 					Загрузить слайды
 				</FileInput>
-				<ImageList images={images} />
-				<Button color="amber" type="submit" style={{ overflow: 'initial' }} className="text-white">
-					Создать конференцию
+				<ImageList oldImages={conference.media_file} images={images} />
+				<Button color="amber" type="submit" className="text-white">
+					Сохранить
 				</Button>
 			</form>
 			<ToastContainer
@@ -177,4 +197,4 @@ const PopupCreate = ({ setActive }: Props) => {
 	);
 };
 
-export default PopupCreate;
+export default PopupEdit;

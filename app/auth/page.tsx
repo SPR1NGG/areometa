@@ -42,8 +42,15 @@ const page = () => {
 
 	return (
 		<div className="bg-[linear-gradient(#E86604,#FCDE00)] w-[500px] p-[1px] rounded-2xl">
-			<div className="bg-white rounded-2xl px-16 py-10 flex flex-col gap-8">
-				<Image priority className="mx-auto" src="/logo.png" alt="Логотип" width={250} height={144} />
+			<form className="bg-white rounded-2xl px-16 py-10 flex flex-col gap-8">
+				<Image
+					priority
+					className="mx-auto"
+					src="/logo.png"
+					alt="Логотип"
+					width={250}
+					height={144}
+				/>
 				<p className="text-xl font-medium text-center">Вход в систему управления</p>
 				<div>
 					<TextBox
@@ -74,12 +81,14 @@ const page = () => {
 					/>
 					<ErrorMessage className="error" errors={errors} as="p" name="password" />{' '}
 				</div>
-				<Button onClick={handleSubmit(onSubmit)}>Авторизоваться</Button>
+				<Button type="submit" onClick={handleSubmit(onSubmit)}>
+					Авторизоваться
+				</Button>
 				<div className="flex justify-between justify-items-end gap-16 font-medium">
 					<Link href="auth/reg">Зарегистрироваться</Link>
 					<Link href="auth/reset">Забыли пароль?</Link>
 				</div>
-			</div>
+			</form>
 		</div>
 	);
 };

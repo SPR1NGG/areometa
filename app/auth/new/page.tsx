@@ -2,7 +2,7 @@
 import Button from '@components/Button';
 import TextBox from '@components/TextBox';
 import { ErrorMessage } from '@hookform/error-message';
-import UserService from 'api/services/UserService';
+import UserService from 'api/services/userService';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -42,7 +42,7 @@ const page = ({ searchParams }: Props) => {
 
 	return (
 		<div className="bg-[linear-gradient(#E86604,#FCDE00)] w-[500px] p-[1px] rounded-2xl mb-16">
-			<div className="bg-white rounded-2xl px-16 py-10 flex flex-col gap-8">
+			<form className="bg-white rounded-2xl px-16 py-10 flex flex-col gap-8">
 				<Image
 					priority
 					className="mx-auto"
@@ -69,8 +69,10 @@ const page = ({ searchParams }: Props) => {
 					/>
 					<ErrorMessage className="error" errors={errors} as="p" name="newpass" />
 				</div>
-				<Button onClick={handleSubmit(onSubmit)}>Сбросить пароль</Button>
-			</div>
+				<Button type="submit" onClick={handleSubmit(onSubmit)}>
+					Сбросить пароль
+				</Button>
+			</form>
 		</div>
 	);
 };

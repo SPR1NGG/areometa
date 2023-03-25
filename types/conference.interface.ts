@@ -1,3 +1,5 @@
+import { RoleEnum } from 'api/services/conferenceService/types/createConferenceDto';
+
 export interface MediaFile {
 	id: string;
 	conference_id: string;
@@ -15,5 +17,13 @@ export default interface IConference {
 		name: string;
 	};
 	media_file: MediaFile[];
-	conference_member: [[Object]];
+	conference_member: {
+		id: number;
+		conference_id: string;
+		user_id: string;
+		role: RoleEnum;
+		user: {
+			email: string;
+		};
+	}[];
 }

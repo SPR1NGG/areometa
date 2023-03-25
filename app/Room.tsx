@@ -7,22 +7,19 @@ import { AiFillDelete } from 'react-icons/ai';
 import { BsFillCalendarCheckFill } from 'react-icons/bs';
 import { FaLock } from 'react-icons/fa';
 import { MdPublic } from 'react-icons/md';
+import { AiFillEdit } from 'react-icons/ai';
 import IConference from 'types/conference.interface';
 import { useConferenceContext } from './Context/conference';
+import { useState } from 'react';
+import PopupEdit from './PopupEdit';
 
-const Room = ({
-	visibility,
-	name,
-	datetime,
-	id,
-	creator,
-	media_file,
-	user,
-	banner_filename,
-}: IConference) => {
+const Room = (conference: IConference) => {
+	const { visibility, name, datetime, id, creator, media_file, user, banner_filename } = conference;
 	const date = datetime.split('T')[0].split('-');
 	const time = datetime.split('T')[1].split('.')[0];
 	const { setConferences } = useConferenceContext();
+	const [isEdit, setIsEdit] = useState(false);
+
 	const session = useSession();
 	const handleClick = async () => {
 		await ConferenceService.remove(id);
@@ -60,15 +57,28 @@ const Room = ({
 				priority
 				className="h-[90px]"
 				src={`${BASE_URL}/uploads/${banner_filename || media_file[0].filename}`}
-				alt={name}
+				alt="баннер"
 				height={90}
 				width={160}
 			/>
-			<div className="ml-8">
-				{session?.data?.user?.id === creator && (
-					<AiFillDelete className="cursor-pointer" fill="#FF6666" onClick={handleClick} />
-				)}
-			</div>
+			{session?.data?.user?.id === creator && (
+				<div className="ml-8 flex gap-2">
+					<AiFillEdit
+						title="редактировать"
+						className="cursor-pointer"
+						fill="#99CC99"
+						onClick={() => setIsEdit(true)}
+					/>
+					<AiFillDelete
+						title="удалить"
+						className="cursor-pointer"
+						fill="#FF6666"
+						onClick={handleClick}
+					/>
+				</div>
+			)}
+
+			{isEdit && <PopupEdit conference={conference} setActive={setIsEdit} />}
 		</div>
 	);
 };

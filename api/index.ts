@@ -2,7 +2,7 @@ import axios from 'axios';
 import { BASE_URL } from 'lib/axios';
 import { getSession } from 'next-auth/react';
 
-export const $api = axios.create({
+const $api = axios.create({
 	baseURL: BASE_URL,
 	headers: { 'Content-Type': 'application/json' },
 });
@@ -20,3 +20,5 @@ $api.interceptors.request.use(
 		return Promise.reject(error);
 	},
 );
+
+export default $api;

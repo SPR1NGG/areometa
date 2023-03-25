@@ -24,7 +24,7 @@ const Filter = ({ filterLabels, setQuery }: Props) => {
 				<span
 					key={label}
 					className={classNames('cursor-pointer', {
-						'bg-gray-100 rounded-xl p-3': active === label,
+						'bg-gray-100 rounded-xl p-2': active === label,
 					})}
 					onClick={() => {
 						if (active !== label) {

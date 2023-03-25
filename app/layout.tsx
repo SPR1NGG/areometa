@@ -1,4 +1,5 @@
 import '../styles/globals.css';
+import 'react-toastify/dist/ReactToastify.css';
 import Providers from './Providers';
 export const metadata = {
 	title: 'Aresmeta',
