@@ -1,5 +1,5 @@
 'use client';
-import ConferenceService from 'api/services/ConferenceService';
+import ConferenceService from 'api/services/conferenceService';
 import GetConferencesQuery from 'api/services/conferenceService/types/getConferences.query';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';

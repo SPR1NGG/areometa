@@ -1,5 +1,5 @@
 'use client';
-import ConferenceService from 'api/services/ConferenceService';
+import ConferenceService from 'api/services/conferenceService';
 import { BASE_URL } from 'lib/axios';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
