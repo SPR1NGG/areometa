@@ -61,7 +61,7 @@ const Room = (conference: IConference) => {
 				height={90}
 				width={160}
 			/>
-			{session?.data?.user?.id === creator && (
+			{(session?.data?.user?.id === creator || session.data?.user.role === 'admin') && (
 				<div className="ml-8 flex gap-2">
 					<AiFillEdit
 						title="редактировать"

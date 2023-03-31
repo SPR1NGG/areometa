@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import ReactPaginate from 'react-paginate';
+import { ToastContainer } from 'react-toastify';
 import { useConferenceContext } from './Context/conference';
 import Filter, { ILabel } from './Filter';
 import Header from './Header';
@@ -91,6 +92,18 @@ const page = () => {
 						)}
 					</div>
 				</div>
+				<ToastContainer
+					position="bottom-left"
+					autoClose={2500}
+					hideProgressBar={false}
+					newestOnTop={false}
+					pauseOnFocusLoss={false}
+					closeOnClick
+					rtl={false}
+					draggable
+					pauseOnHover
+					theme="light"
+				/>
 			</div>
 		);
 	}

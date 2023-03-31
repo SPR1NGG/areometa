@@ -72,12 +72,13 @@ const PopupCreate = ({ setActive }: Props) => {
 			return;
 		}
 
-		if (
-			((listeners.length === 0 || speakers.length === 0) && visibility === 'private') ||
-			(visibility === 'public' && speakers.length === 0)
-		) {
-			toast.error('Укажите участников');
+		if (visibility === 'public' && speakers.length === 0) {
+			toast.error('Укажите спикеров');
 			return;
+		}
+
+		if ((listeners.length === 0 || speakers.length === 0) && visibility === 'private') {
+			toast.error('Укажите участников');
 		}
 
 		if (visibility === undefined) {
@@ -88,14 +89,20 @@ const PopupCreate = ({ setActive }: Props) => {
 		const uploadedImg: AxiosResponse<string[]> = await ConferenceService.uploadImages(images);
 		const bannerImg: AxiosResponse<string[]> = await ConferenceService.uploadImages(banner);
 
-		await ConferenceService.create({
-			name: data.name,
-			images: uploadedImg.data,
-			visibility,
-			bannerFilename: bannerImg.data[0],
-			datetime: new Date(datetime.setHours(datetime.getHours() + 3)),
-			conferenceMember: [...listeners, ...speakers],
-		});
+		await toast.promise(
+			ConferenceService.create({
+				name: data.name,
+				images: uploadedImg.data,
+				visibility,
+				bannerFilename: bannerImg.data[0],
+				datetime: new Date(datetime.setHours(datetime.getHours() + 3)),
+				conferenceMember: [...listeners, ...speakers],
+			}),
+			{
+				pending: 'Создание конференции',
+				success: 'Конференция создана',
+			},
+		);
 
 		const conferences = await ConferenceService.get();
 		setConferences(conferences.data.conferences);
@@ -161,18 +168,6 @@ const PopupCreate = ({ setActive }: Props) => {
 					Создать конференцию
 				</Button>
 			</form>
-			<ToastContainer
-				position="bottom-left"
-				autoClose={2500}
-				hideProgressBar={false}
-				newestOnTop={false}
-				pauseOnFocusLoss={false}
-				closeOnClick
-				rtl={false}
-				draggable
-				pauseOnHover
-				theme="light"
-			/>
 		</div>
 	);
 };

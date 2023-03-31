@@ -18,7 +18,7 @@ const Header = () => {
 				<Button onClick={() => setActive(true)}>Создать конференцию</Button>
 				<Link
 					className="bg-[linear-gradient(93deg,#E86605,#FCDF00)] text-white font-medium rounded-xl px-8 py-4"
-					href="https://squidass.com/aresmeta/"
+					href="https://aresmeta.sqkrv.com/"
 				>
 					Войти в метавселенную
 				</Link>

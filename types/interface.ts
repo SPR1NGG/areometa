@@ -3,4 +3,5 @@ export default interface User {
 	email: string;
 	accessToken: string;
 	refreshToken: string;
+	role: 'user' | 'admin';
 }

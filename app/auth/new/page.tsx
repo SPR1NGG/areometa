@@ -32,10 +32,8 @@ const page = ({ searchParams }: Props) => {
 			await UserService.reset(searchParams.token, data.newpass);
 			reset({ newpass: '' });
 			toast.success('Пароль успешно изменён');
-			toast.onChange((payload: ToastItem) => {
-				if (payload.status === 'removed') {
-					router.push('/auth');
-				}
+			toast.onChange(() => {
+				router.push('/auth');
 			});
 		}
 	};

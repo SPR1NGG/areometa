@@ -181,18 +181,6 @@ const PopupEdit = ({ setActive, conference }: Props) => {
 					Сохранить
 				</Button>
 			</form>
-			<ToastContainer
-				position="bottom-left"
-				autoClose={2500}
-				hideProgressBar={false}
-				newestOnTop={false}
-				pauseOnFocusLoss={false}
-				closeOnClick
-				rtl={false}
-				draggable
-				pauseOnHover
-				theme="light"
-			/>
 		</div>
 	);
 };
