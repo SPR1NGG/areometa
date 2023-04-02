@@ -3,6 +3,7 @@ import createConferenceDto from './types/createConferenceDto';
 import GetConferences from './types/getConferences';
 import GetConferencesQuery from './types/getConferences.query';
 import { AxiosResponse } from 'axios';
+import updateDto from './types/updateDto';
 
 export default class ConferenceService {
 	static async create({
@@ -24,7 +25,7 @@ export default class ConferenceService {
 	}
 
 	static async update(
-		{ name, images, datetime, visibility, conferenceMember, bannerFilename }: createConferenceDto,
+		{ name, images, datetime, visibility, conferenceMember, bannerFilename }: updateDto,
 		id: string,
 	) {
 		return $api.patch(`/conferences/${id}`, {
@@ -32,7 +33,7 @@ export default class ConferenceService {
 			datetime: datetime,
 			visibility: visibility,
 			banner_filename: bannerFilename,
-			media_file: images.map((img) => ({ filename: img })),
+			media_file: images,
 			conference_member: conferenceMember.map(({ email, ...user }) => user),
 		});
 	}

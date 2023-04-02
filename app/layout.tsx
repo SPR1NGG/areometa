@@ -1,5 +1,6 @@
-import '../styles/globals.css';
 import 'react-toastify/dist/ReactToastify.css';
+import '../styles/globals.css';
+import Header from './Header';
 import Providers from './Providers';
 export const metadata = {
 	title: 'Aresmeta',
@@ -18,7 +19,12 @@ export default function RootLayout({ children }: IProps) {
 	return (
 		<html lang="ru">
 			<body className="bg-[#F2F2ED]">
-				<Providers>{children}</Providers>
+				<Providers>
+					<div className="grid h-screen grid-rows-[100px,1fr]">
+						<Header />
+						{children}
+					</div>
+				</Providers>
 			</body>
 		</html>
 	);

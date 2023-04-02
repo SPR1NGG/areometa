@@ -15,10 +15,9 @@ import { UPLOAD_URL } from 'lib/axios';
 import Image from 'next/image';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import { useForm } from 'react-hook-form';
 import { RxCross2 } from 'react-icons/rx';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import IConference from 'types/conference.interface';
 import { useConferenceContext } from './Context/conference';
 import UserList from './UserList';
@@ -40,6 +39,7 @@ const PopupEdit = ({ setActive, conference }: Props) => {
 		handleSubmit,
 		formState: { errors },
 	} = useForm<Inputs>();
+	const [oldImages, setOldImages] = useState(conference.media_file);
 	const [images, setImages] = useState<File[]>([]);
 	const [banner, setBanner] = useState<File[]>([]);
 	const [datetime, setDatetime] = useState<Date>(new Date(conference.datetime));
@@ -95,16 +95,24 @@ const PopupEdit = ({ setActive, conference }: Props) => {
 		const uploadedImg: AxiosResponse<string[]> = await ConferenceService.uploadImages(images);
 		const bannerImg: AxiosResponse<string[]> = await ConferenceService.uploadImages(banner);
 
-		await ConferenceService.update(
+		const deletedImages = conference.media_file.filter((mf) => !oldImages.includes(mf));
+
+		toast.promise(
+			ConferenceService.update(
+				{
+					name: data.name,
+					images: [...uploadedImg.data.map((str) => ({ filename: str })), ...deletedImages],
+					visibility,
+					bannerFilename: bannerImg.data[0],
+					datetime: new Date(datetime.setHours(datetime.getHours())),
+					conferenceMember: [...listeners, ...speakers],
+				},
+				conference.id,
+			),
 			{
-				name: data.name,
-				images: uploadedImg.data,
-				visibility,
-				bannerFilename: bannerImg.data[0],
-				datetime: new Date(datetime.setHours(datetime.getHours() + 3)),
-				conferenceMember: [...listeners, ...speakers],
+				pending: 'Сохранение конференции',
+				success: 'Конференция изменена',
 			},
-			conference.id,
 		);
 
 		const conferences = await ConferenceService.get();
@@ -116,14 +124,14 @@ const PopupEdit = ({ setActive, conference }: Props) => {
 	return (
 		<div
 			className="fixed w-full h-full bg-gray-900 top-0 left-0 bg-opacity-25 flex justify-center items-center"
-			onClick={(e) =>
+			onMouseDown={(e) =>
 				e.target instanceof Element && !e.target.closest('#create-modal') && setActive(false)
 			}
 		>
 			<form
 				onSubmit={handleSubmit(onSubmit)}
 				id="create-modal"
-				className="bg-white overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-600 scrollbar-thumb-rounded max-h-[80vh] w-[600px] rounded-lg p-4 flex flex-col gap-4 relative"
+				className="bg-white overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-600 scrollbar-thumb-rounded max-h-[80vh] w-[700px] rounded-lg p-4 flex flex-col gap-4 relative"
 			>
 				<RxCross2 onClick={() => setActive(false)} className="self-end cursor-pointer" />
 				<Input
@@ -137,29 +145,32 @@ const PopupEdit = ({ setActive, conference }: Props) => {
 				/>
 				<ErrorMessage className="error" errors={errors} as="p" name="name" />
 				<Select visibility={conference.visibility} setVisibility={setVisibility} />
-				<DatePicker
-					selected={datetime}
-					onChange={(date) => date && setDatetime(date)}
-					locale="ru"
-					showTimeInput
-					timeFormat="p"
-					className="w-full border-t-blue-gray-200 text-blue-gray-700 rounded-lg"
-					dateFormat="Pp"
-					minDate={new Date()}
-					timeInputLabel="Время:"
-				/>
+				<div>
+					<DatePicker
+						selected={datetime}
+						onChange={(date) => date && setDatetime(date)}
+						locale="ru"
+						showTimeInput
+						timeFormat="p"
+						className="w-full border-t-blue-gray-200 text-blue-gray-700 rounded-lg"
+						dateFormat="Pp"
+						minDate={new Date()}
+						timeInputLabel="Время:"
+					/>
+				</div>
 				<FileInput setImages={setBanner} name="banner" isMultiple={false}>
 					Загрузить баннер
 				</FileInput>
 				{banner.length === 0 && conference.banner_filename ? (
 					<Image
+						className="h-[90px] w-[160px] border border-black rounded-xl"
 						alt="баннер"
 						src={`${UPLOAD_URL}${conference.banner_filename}`}
-						height={68}
-						width={120}
+						height={90}
+						width={160}
 					/>
 				) : (
-					<ImageList images={banner} />
+					<ImageList setImages={setBanner} images={banner} />
 				)}
 				<UserList
 					label="Спикеры"
@@ -176,7 +187,12 @@ const PopupEdit = ({ setActive, conference }: Props) => {
 				<FileInput setImages={setImages} name="images">
 					Загрузить слайды
 				</FileInput>
-				<ImageList oldImages={conference.media_file} images={images} />
+				<ImageList
+					setImages={setImages}
+					images={images}
+					oldImages={oldImages}
+					setOldImages={setOldImages}
+				/>
 				<Button color="amber" type="submit" className="text-white">
 					Сохранить
 				</Button>

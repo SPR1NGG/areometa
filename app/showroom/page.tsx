@@ -1,52 +1,37 @@
 'use client';
 import Button from '@components/Button';
-import ConferenceService from 'api/services/conferenceService';
-import GetConferencesQuery from 'api/services/conferenceService/types/getConferences.query';
+import ShowroomService from 'api/services/showroomService';
+import ShowroomQuery from 'api/services/showroomService/types/ShowroomQuery';
+import { useShowroomContext } from 'app/Context/showroom';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { AiOutlineFileAdd } from 'react-icons/ai';
 import ReactPaginate from 'react-paginate';
-import { useConferenceContext } from './Context/conference';
-import Filter, { ILabel } from './Filter';
 import PopupCreate from './PopupCreate';
 import Room from './Room';
-import 'react-datepicker/dist/react-datepicker.css';
 
 const page = () => {
-	const [query, setQuery] = useState<GetConferencesQuery>();
-	const { conferences, setConferences } = useConferenceContext();
+	const [query, setQuery] = useState<ShowroomQuery>();
+	const { showroom, setShowroom } = useShowroomContext();
 	const session = useSession();
 	const router = useRouter();
 	const step = 10;
 	const total = useRef(0);
 	const [active, setActive] = useState(false);
 
-	const typeLabels: ILabel[] = [
-		{ label: 'Все', value: 'all' },
-		{ label: 'Открытые', value: 'public' },
-		{ label: 'Закрытые', value: 'private' },
-	];
-
-	const timeLabels: ILabel[] = [
-		{ label: 'Все', value: 'all' },
-		{ label: 'Сегодня', value: 'today' },
-		{ label: 'Будущие', value: 'future' },
-		{ label: 'Прошедшие', value: 'past' },
-	];
-
 	useEffect(() => {
 		if (session.status === 'unauthenticated') {
 			router.push('/auth');
 		} else {
-			ConferenceService.get().then((data) => setConferences(data.data.conferences));
+			ShowroomService.get().then((data) => setShowroom(data.data.showroom));
 		}
 	}, [session.status]);
 
 	useEffect(() => {
 		if (session.status === 'authenticated' && query) {
-			ConferenceService.get(query).then(({ data }) => {
-				setConferences(data.conferences);
+			ShowroomService.get(query).then(({ data }) => {
+				setShowroom(data.showroom);
 				total.current = data.total;
 			});
 		}
@@ -61,28 +46,16 @@ const page = () => {
 			<div className="grid grid-cols-1 h-full container mx-auto">
 				<div className="p-4 flex flex-col gap-4 max-h-[calc(100vh_-_100px)]">
 					<div className="flex justify-between items-center">
-						<p className="text-xl">Конференции</p>
+						<p className="text-xl">Шоурум</p>
 						<Button
 							className="w-max flex px-4 py-2 items-center gap-2"
 							onClick={() => setActive(true)}
 						>
-							<AiOutlineFileAdd /> Создать конферецию
+							<AiOutlineFileAdd /> Создать шоурум
 						</Button>
 					</div>
-					<div className="bg-white rounded-xl">
-						<Filter
-							filterLabels={typeLabels}
-							setQuery={(val) => setQuery((prev) => ({ ...prev, visibility: val }))}
-						/>
-						<Filter
-							filterLabels={timeLabels}
-							setQuery={(val) => setQuery((prev) => ({ ...prev, datetime: val }))}
-						/>
-					</div>
-
 					<div className="flex flex-col gap-4 overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-600 scrollbar-thumb-rounded">
-						{conferences.length > 0 &&
-							conferences.map((conference) => <Room key={conference.id} {...conference} />)}
+						{showroom.length > 0 && showroom.map((room) => <Room key={room.id} {...room} />)}
 					</div>
 					{Math.ceil(total.current / step) > 1 && (
 						<ReactPaginate

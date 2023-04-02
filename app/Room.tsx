@@ -15,8 +15,12 @@ import PopupEdit from './PopupEdit';
 
 const Room = (conference: IConference) => {
 	const { visibility, name, datetime, id, creator, media_file, user, banner_filename } = conference;
-	const date = datetime.split('T')[0].split('-');
-	const time = datetime.split('T')[1].split('.')[0];
+	const conferenceDate = new Date(datetime);
+	const rightDate = new Date(
+		conferenceDate.setHours(conferenceDate.getHours() - new Date().getTimezoneOffset() / 60),
+	).toISOString();
+	const date = rightDate.split('T')[0].split('-');
+	const time = rightDate.split('T')[1].split('.')[0];
 	const { setConferences } = useConferenceContext();
 	const [isEdit, setIsEdit] = useState(false);
 

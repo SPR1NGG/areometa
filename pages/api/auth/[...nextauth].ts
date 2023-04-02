@@ -45,8 +45,6 @@ export const authOptions: NextAuthOptions = {
 			//  ...so we set "user" param of "token" to object from "authorize"...
 			//  ...and return it...
 
-			console.log(token);
-
 			if (token.accessToken) {
 				const decoded = parseJwt(token.accessToken as string);
 				if (Date.now() >= decoded.exp * 1000) {
@@ -62,7 +60,6 @@ export const authOptions: NextAuthOptions = {
 			return { ...token, ...user };
 		},
 		async session({ session, token }) {
-			console.log(token);
 			session.user = token as any;
 			return session;
 		},

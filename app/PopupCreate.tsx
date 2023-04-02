@@ -13,10 +13,9 @@ import { AxiosResponse } from 'axios';
 import ru from 'date-fns/locale/ru';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import { useForm } from 'react-hook-form';
 import { RxCross2 } from 'react-icons/rx';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { useConferenceContext } from './Context/conference';
 import UserList from './UserList';
 
@@ -95,7 +94,7 @@ const PopupCreate = ({ setActive }: Props) => {
 				images: uploadedImg.data,
 				visibility,
 				bannerFilename: bannerImg.data[0],
-				datetime: new Date(datetime.setHours(datetime.getHours() + 3)),
+				datetime: new Date(datetime.setHours(datetime.getHours())),
 				conferenceMember: [...listeners, ...speakers],
 			}),
 			{
@@ -113,14 +112,14 @@ const PopupCreate = ({ setActive }: Props) => {
 	return (
 		<div
 			className="fixed w-full h-full bg-gray-900 top-0 left-0 bg-opacity-25 flex justify-center items-center"
-			onClick={(e) =>
+			onMouseDown={(e) =>
 				e.target instanceof Element && !e.target.closest('#create-modal') && setActive(false)
 			}
 		>
 			<form
 				onSubmit={handleSubmit(onSubmit)}
 				id="create-modal"
-				className="bg-white overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-600 scrollbar-thumb-rounded max-h-[80vh] w-[600px] rounded-lg p-4 flex flex-col gap-4 relative"
+				className="bg-white overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-600 scrollbar-thumb-rounded max-h-[80vh] w-[700px] rounded-lg p-4 flex flex-col gap-4 relative"
 			>
 				<RxCross2 onClick={() => setActive(false)} className="self-end cursor-pointer" />
 				<Input
@@ -133,21 +132,23 @@ const PopupCreate = ({ setActive }: Props) => {
 				/>
 				<ErrorMessage className="error" errors={errors} as="p" name="name" />
 				<Select setVisibility={setVisibility} />
-				<DatePicker
-					selected={datetime}
-					onChange={(date) => date && setDatetime(date)}
-					locale="ru"
-					showTimeInput
-					timeFormat="p"
-					className="w-full border-t-blue-gray-200 text-blue-gray-700 rounded-lg"
-					dateFormat="Pp"
-					minDate={new Date()}
-					timeInputLabel="Время:"
-				/>
+				<div>
+					<DatePicker
+						selected={datetime}
+						onChange={(date) => date && setDatetime(date)}
+						locale="ru"
+						showTimeInput
+						timeFormat="p"
+						className="w-full border-t-blue-gray-200 text-blue-gray-700 rounded-lg"
+						dateFormat="Pp"
+						minDate={new Date()}
+						timeInputLabel="Время:"
+					/>
+				</div>
 				<FileInput setImages={setBanner} name="banner" isMultiple={false}>
 					Загрузить баннер
 				</FileInput>
-				<ImageList images={banner} />
+				<ImageList setImages={setBanner} images={banner} />
 				<UserList
 					label="Спикеры"
 					name={RoleEnum.speaker}
@@ -160,10 +161,14 @@ const PopupCreate = ({ setActive }: Props) => {
 					users={conferenceMembers}
 					setUsers={setConferenceMembers}
 				/>
-				<FileInput setImages={setImages} name="images">
+				<FileInput
+					setImages={setImages}
+					name="images"
+					accept="image/jpeg, image/png, image/jpg, application/pdf"
+				>
 					Загрузить слайды
 				</FileInput>
-				<ImageList images={images} />
+				<ImageList setImages={setImages} images={images} />
 				<Button color="amber" type="submit" style={{ overflow: 'initial' }} className="text-white">
 					Создать конференцию
 				</Button>
