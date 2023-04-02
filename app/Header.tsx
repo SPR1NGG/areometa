@@ -12,7 +12,7 @@ const Header = () => {
 	const pathname = usePathname();
 
 	if (pathname?.includes('auth')) {
-		return;
+		return null;
 	}
 
 	return (
