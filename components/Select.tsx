@@ -3,27 +3,33 @@
 import { Option, Select as SelectElement } from '@material-tailwind/react';
 import { Dispatch, SetStateAction } from 'react';
 
-interface Props {
-	visibility?: 'public' | 'private' | undefined;
-	setVisibility: Dispatch<SetStateAction<'public' | 'private' | undefined>>;
+export interface SelectValue {
+	value: string;
+	label: string;
 }
 
-export default function Select({ setVisibility, visibility }: Props) {
+interface Props {
+	label: string;
+	setValue: Dispatch<SetStateAction<any | undefined>>;
+	values: SelectValue[];
+	defValue?: string;
+}
+
+export default function Select({ setValue, values, label, defValue }: Props) {
 	return (
 		<div className="w-full">
 			<SelectElement
-				label="Тип конференции"
+				label={label}
 				color="amber"
 				size="lg"
+				value={defValue}
 				onChange={() => undefined}
-				value={visibility}
 			>
-				<Option value="public" onClick={() => setVisibility('public')}>
-					Публичная
-				</Option>
-				<Option value="private" onClick={() => setVisibility('private')}>
-					Закрытая
-				</Option>
+				{values.map((value) => (
+					<Option value={value.value} key={value.value} onClick={() => setValue(value.value)}>
+						{value.label}
+					</Option>
+				))}
 			</SelectElement>
 		</div>
 	);

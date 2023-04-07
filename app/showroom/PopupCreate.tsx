@@ -9,7 +9,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RxCross2 } from 'react-icons/rx';
 import { toast } from 'react-toastify';
-import ContentPreview from './ContentPreview';
+import ContentPreview from '@components/ContentPreview';
 
 interface Props {
 	setActive: Dispatch<SetStateAction<boolean>>;
@@ -45,7 +45,7 @@ const PopupCreate = ({ setActive }: Props) => {
 
 	const onSubmit = async (data: Inputs) => {
 		const uploadedVideo: AxiosResponse<string[]> = await ShowroomService.uploadVideo(video[0]);
-		console.log(uploadedVideo);
+
 		await toast.promise(
 			ShowroomService.create({
 				filename: uploadedVideo.data[0],
@@ -101,14 +101,14 @@ const PopupCreate = ({ setActive }: Props) => {
 						</FileInput>
 						<p className="text-xs">mp4, jpg, png</p>
 					</div>
-					<p className="my-2">или</p>
+					{/* <p className="my-2">или</p>
 					<Input
 						color="amber"
 						autoComplete="off"
 						label="Укажите ссылку"
 						disabled={video.length === 1}
 						{...register('url')}
-					/>
+					/> */}
 				</div>
 
 				<ContentPreview setVideo={setVideo} file={video[0]} />

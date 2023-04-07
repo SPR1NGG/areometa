@@ -16,4 +16,5 @@ export default interface createConferenceDto {
 	bannerFilename: string;
 	visibility: 'public' | 'private';
 	conferenceMember: ConferenceMember[];
+	mediaType: string;
 }

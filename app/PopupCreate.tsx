@@ -1,4 +1,5 @@
 'use client';
+import ContentPreview from '@components/ContentPreview';
 import FileInput from '@components/FileInput';
 import ImageList from '@components/ImageList';
 import Select from '@components/Select';
@@ -16,6 +17,7 @@ import DatePicker, { registerLocale } from 'react-datepicker';
 import { useForm } from 'react-hook-form';
 import { RxCross2 } from 'react-icons/rx';
 import { toast } from 'react-toastify';
+import { typeLabel, typeValues, visibilityLabel, visibilityValues } from './conference.constants';
 import { useConferenceContext } from './Context/conference';
 import UserList from './UserList';
 
@@ -35,10 +37,12 @@ const PopupCreate = ({ setActive }: Props) => {
 		handleSubmit,
 		formState: { errors },
 	} = useForm<Inputs>();
+	const [video, setVideo] = useState<File[]>([]);
 	const [images, setImages] = useState<File[]>([]);
 	const [banner, setBanner] = useState<File[]>([]);
 	const [datetime, setDatetime] = useState<Date>(new Date());
-	const [visibility, setVisibility] = useState<'public' | 'private'>();
+	const [visibility, setVisibility] = useState<'public' | 'private' | undefined>();
+	const [type, setType] = useState<'image' | 'video' | undefined>();
 	const [conferenceMembers, setConferenceMembers] = useState<ConferenceMember[]>([]);
 
 	const { setConferences } = useConferenceContext();
@@ -66,8 +70,8 @@ const PopupCreate = ({ setActive }: Props) => {
 			return;
 		}
 
-		if (images.length === 0) {
-			toast.error('Загрузите слайды');
+		if (images.length === 0 && video.length === 0) {
+			toast.error('Загрузите контент');
 			return;
 		}
 
@@ -85,27 +89,37 @@ const PopupCreate = ({ setActive }: Props) => {
 			return;
 		}
 
-		const uploadedImg: AxiosResponse<string[]> = await ConferenceService.uploadImages(images);
+		if (type === undefined) {
+			toast.error('Укажите тип презентации');
+			return;
+		}
+
+		const id = toast.loading('Создание конференции');
+
+		const uploadedImg: AxiosResponse<string[]> = await ConferenceService.uploadImages(
+			type === 'image' ? images : video,
+		);
 		const bannerImg: AxiosResponse<string[]> = await ConferenceService.uploadImages(banner);
 
-		await toast.promise(
-			ConferenceService.create({
-				name: data.name,
-				images: uploadedImg.data,
-				visibility,
-				bannerFilename: bannerImg.data[0],
-				datetime: new Date(datetime.setHours(datetime.getHours())),
-				conferenceMember: [...listeners, ...speakers],
-			}),
-			{
-				pending: 'Создание конференции',
-				success: 'Конференция создана',
-			},
-		);
+		await ConferenceService.create({
+			name: data.name,
+			mediaType: type,
+			images: uploadedImg.data,
+			visibility,
+			bannerFilename: bannerImg.data[0],
+			datetime: new Date(datetime.setHours(datetime.getHours())),
+			conferenceMember: [...listeners, ...speakers],
+		});
+
+		toast.update(id, {
+			render: 'Конференция создана',
+			type: 'success',
+			isLoading: false,
+			autoClose: 2500,
+		});
 
 		const conferences = await ConferenceService.get();
 		setConferences(conferences.data.conferences);
-
 		setActive(false);
 	};
 
@@ -131,7 +145,7 @@ const PopupCreate = ({ setActive }: Props) => {
 					})}
 				/>
 				<ErrorMessage className="error" errors={errors} as="p" name="name" />
-				<Select setVisibility={setVisibility} />
+				<Select label={visibilityLabel} values={visibilityValues} setValue={setVisibility} />
 				<div>
 					<DatePicker
 						selected={datetime}
@@ -161,13 +175,29 @@ const PopupCreate = ({ setActive }: Props) => {
 					users={conferenceMembers}
 					setUsers={setConferenceMembers}
 				/>
-				<FileInput
-					setImages={setImages}
-					name="images"
-					accept="image/jpeg, image/png, image/jpg, application/pdf"
-				>
-					Загрузить слайды
-				</FileInput>
+				<Select label={typeLabel} values={typeValues} setValue={setType} />
+				{type === 'image' && (
+					<FileInput
+						setImages={setImages}
+						name="images"
+						accept="image/jpeg, image/png, image/jpg, application/pdf"
+					>
+						Загрузить слайды
+					</FileInput>
+				)}
+				{type === 'video' && (
+					<>
+						<div className="flex items-end gap-1">
+							<FileInput setImages={setVideo} name="video" isMultiple={false} accept="video/mp4">
+								Загрузить контент
+							</FileInput>
+							<p className="text-xs">mp4, jpg, png</p>
+						</div>
+
+						<ContentPreview setVideo={setVideo} file={video[0]} />
+					</>
+				)}
+
 				<ImageList setImages={setImages} images={images} />
 				<Button color="amber" type="submit" style={{ overflow: 'initial' }} className="text-white">
 					Создать конференцию

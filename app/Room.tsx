@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { AiFillDelete } from 'react-icons/ai';
 import { BsFillCalendarCheckFill } from 'react-icons/bs';
-import { FaLock } from 'react-icons/fa';
+import { FaFileVideo, FaLock } from 'react-icons/fa';
 import { MdPublic } from 'react-icons/md';
 import { AiFillEdit } from 'react-icons/ai';
 import IConference from 'types/conference.interface';
@@ -57,14 +57,17 @@ const Room = (conference: IConference) => {
 				<p className="text-center text-xl">{name}</p>
 				<p className="text-center text-xs">Автор: {user.name}</p>
 			</div>
-			<Image
-				priority
-				className="h-[90px]"
-				src={`${BASE_URL}/uploads/${banner_filename || media_file[0].filename}`}
-				alt="баннер"
-				height={90}
-				width={160}
-			/>
+			{conference.media_file[0].media_type === 'image' && (
+				<Image
+					priority
+					className="h-[90px]"
+					src={`${BASE_URL}/uploads/${banner_filename || media_file[0].filename}`}
+					alt="баннер"
+					height={90}
+					width={160}
+				/>
+			)}
+			{conference.media_file[0].media_type === 'video' && <FaFileVideo size={32} fill="#ADD8E6" />}
 			{(session?.data?.user?.id === creator || session.data?.user.role === 'admin') && (
 				<div className="ml-8 flex gap-2">
 					<AiFillEdit

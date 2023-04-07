@@ -4,6 +4,7 @@ export interface MediaFile {
 	id: string;
 	conference_id: string;
 	filename: string;
+	media_type: 'image' | 'video';
 }
 
 export default interface IConference {

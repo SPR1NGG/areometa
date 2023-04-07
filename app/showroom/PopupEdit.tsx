@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import { RxCross2 } from 'react-icons/rx';
 import { toast } from 'react-toastify';
 import IShowroom from 'types/showroom.interface';
-import ContentPreview from './ContentPreview';
+import ContentPreview from '../../components/ContentPreview';
 
 interface Props {
 	setActive: Dispatch<SetStateAction<boolean>>;

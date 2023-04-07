@@ -13,11 +13,13 @@ export default class ConferenceService {
 		visibility,
 		conferenceMember,
 		bannerFilename,
+		mediaType,
 	}: createConferenceDto) {
 		return $api.post(`/conferences`, {
 			name,
 			datetime: datetime,
 			visibility: visibility,
+			mediaType,
 			banner_filename: bannerFilename,
 			media_file: images.map((img) => ({ filename: img })),
 			conference_member: conferenceMember.map(({ email, ...user }) => user),
@@ -25,13 +27,14 @@ export default class ConferenceService {
 	}
 
 	static async update(
-		{ name, images, datetime, visibility, conferenceMember, bannerFilename }: updateDto,
+		{ name, images, datetime, visibility, conferenceMember, bannerFilename, mediaType }: updateDto,
 		id: string,
 	) {
 		return $api.patch(`/conferences/${id}`, {
 			name,
-			datetime: datetime,
-			visibility: visibility,
+			datetime,
+			visibility,
+			mediaType,
 			banner_filename: bannerFilename,
 			media_file: images,
 			conference_member: conferenceMember.map(({ email, ...user }) => user),

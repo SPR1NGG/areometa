@@ -1,4 +1,5 @@
 'use client';
+import ContentPreview from '@components/ContentPreview';
 import FileInput from '@components/FileInput';
 import ImageList from '@components/ImageList';
 import Select from '@components/Select';
@@ -10,19 +11,17 @@ import {
 	RoleEnum,
 } from 'api/services/conferenceService/types/createConferenceDto';
 import { AxiosResponse } from 'axios';
-import ru from 'date-fns/locale/ru';
-import { UPLOAD_URL } from 'lib/axios';
+import { BASE_URL, UPLOAD_URL } from 'lib/axios';
 import Image from 'next/image';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import DatePicker, { registerLocale } from 'react-datepicker';
+import DatePicker from 'react-datepicker';
 import { useForm } from 'react-hook-form';
 import { RxCross2 } from 'react-icons/rx';
 import { toast } from 'react-toastify';
 import IConference from 'types/conference.interface';
+import { typeLabel, typeValues, visibilityLabel, visibilityValues } from './conference.constants';
 import { useConferenceContext } from './Context/conference';
 import UserList from './UserList';
-
-registerLocale('ru', ru);
 
 interface Props {
 	setActive: Dispatch<SetStateAction<boolean>>;
@@ -40,11 +39,18 @@ const PopupEdit = ({ setActive, conference }: Props) => {
 		formState: { errors },
 	} = useForm<Inputs>();
 	const [oldImages, setOldImages] = useState(conference.media_file);
+	const [video, setVideo] = useState<File[]>([]);
+	const [old, setOld] = useState<string>(
+		`${BASE_URL}/uploads/${conference.media_file[0].filename}`,
+	);
 	const [images, setImages] = useState<File[]>([]);
 	const [banner, setBanner] = useState<File[]>([]);
 	const [datetime, setDatetime] = useState<Date>(new Date(conference.datetime));
 	const [visibility, setVisibility] = useState<'public' | 'private' | undefined>(
 		conference.visibility,
+	);
+	const [type, setType] = useState<'video' | 'image' | undefined>(
+		conference.media_file[0].media_type,
 	);
 	const [conferenceMembers, setConferenceMembers] = useState<ConferenceMember[]>(
 		conference.conference_member.map((user) => ({
@@ -92,28 +98,43 @@ const PopupEdit = ({ setActive, conference }: Props) => {
 			return;
 		}
 
-		const uploadedImg: AxiosResponse<string[]> = await ConferenceService.uploadImages(images);
-		const bannerImg: AxiosResponse<string[]> = await ConferenceService.uploadImages(banner);
+		if (type === undefined) {
+			toast.error('Укажите тип презентации');
+			return;
+		}
 
-		const deletedImages = conference.media_file.filter((mf) => !oldImages.includes(mf));
+		const id = toast.loading('Сохранение конференции');
 
-		toast.promise(
-			ConferenceService.update(
-				{
-					name: data.name,
-					images: [...uploadedImg.data.map((str) => ({ filename: str })), ...deletedImages],
-					visibility,
-					bannerFilename: bannerImg.data[0],
-					datetime: new Date(datetime.setHours(datetime.getHours())),
-					conferenceMember: [...listeners, ...speakers],
-				},
-				conference.id,
-			),
-			{
-				pending: 'Сохранение конференции',
-				success: 'Конференция изменена',
-			},
+		const uploadedImg: AxiosResponse<string[]> = await ConferenceService.uploadImages(
+			type === 'image' ? images : video,
 		);
+		const bannerImg: AxiosResponse<string[]> = await ConferenceService.uploadImages(banner);
+		const deletedImages = conference.media_file.filter((mf) => !oldImages.includes(mf));
+		const deletedType = type !== conference.media_file[0].media_type ? conference.media_file : [];
+
+		await ConferenceService.update(
+			{
+				name: data.name,
+				images: [
+					...uploadedImg.data.map((str) => ({ filename: str })),
+					...deletedImages,
+					...deletedType,
+				],
+				visibility,
+				mediaType: type,
+				bannerFilename: bannerImg.data[0],
+				datetime: new Date(datetime.setHours(datetime.getHours())),
+				conferenceMember: [...listeners, ...speakers],
+			},
+			conference.id,
+		);
+
+		toast.update(id, {
+			render: 'Конференция изменена',
+			type: 'success',
+			isLoading: false,
+			autoClose: 2500,
+		});
 
 		const conferences = await ConferenceService.get();
 		setConferences(conferences.data.conferences);
@@ -144,7 +165,12 @@ const PopupEdit = ({ setActive, conference }: Props) => {
 					})}
 				/>
 				<ErrorMessage className="error" errors={errors} as="p" name="name" />
-				<Select visibility={conference.visibility} setVisibility={setVisibility} />
+				<Select
+					defValue={conference.visibility}
+					label={visibilityLabel}
+					values={visibilityValues}
+					setValue={setVisibility}
+				/>
 				<div>
 					<DatePicker
 						selected={datetime}
@@ -184,15 +210,42 @@ const PopupEdit = ({ setActive, conference }: Props) => {
 					users={conferenceMembers}
 					setUsers={setConferenceMembers}
 				/>
-				<FileInput setImages={setImages} name="images">
-					Загрузить слайды
-				</FileInput>
-				<ImageList
-					setImages={setImages}
-					images={images}
-					oldImages={oldImages}
-					setOldImages={setOldImages}
-				/>
+				<Select label={typeLabel} values={typeValues} defValue={type} setValue={setType} />
+				{type === 'image' && (
+					<>
+						<FileInput
+							setImages={setImages}
+							name="images"
+							accept="image/jpeg, image/png, image/jpg, application/pdf"
+						>
+							Загрузить слайды
+						</FileInput>
+
+						<ImageList
+							setImages={setImages}
+							images={images}
+							oldImages={type === conference.media_file[0].media_type ? oldImages : undefined}
+							setOldImages={setOldImages}
+						/>
+					</>
+				)}
+				{type === 'video' && (
+					<>
+						<div className="flex items-end gap-1">
+							<FileInput setImages={setVideo} name="video" isMultiple={false} accept="video/mp4">
+								Загрузить контент
+							</FileInput>
+							<p className="text-xs">mp4, jpg, png</p>
+						</div>
+
+						<ContentPreview
+							old={type === conference.media_file[0].media_type ? old : undefined}
+							setOld={setOld}
+							setVideo={setVideo}
+							file={video[0]}
+						/>
+					</>
+				)}
 				<Button color="amber" type="submit" className="text-white">
 					Сохранить
 				</Button>

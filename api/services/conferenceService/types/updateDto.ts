@@ -8,4 +8,5 @@ export default interface updateDto {
 	bannerFilename: string;
 	visibility: 'public' | 'private';
 	conferenceMember: ConferenceMember[];
+	mediaType: string;
 }
