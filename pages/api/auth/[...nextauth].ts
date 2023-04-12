@@ -22,6 +22,7 @@ export const authOptions: NextAuthOptions = {
 				password: { label: 'Password', type: 'password' },
 			},
 			authorize(credentials) {
+				console.log('start');
 				const { username, password } = credentials as any;
 				return axios
 					.post('/auth/login', {
@@ -32,6 +33,7 @@ export const authOptions: NextAuthOptions = {
 						return res.data;
 					})
 					.catch((error) => {
+						console.log(error);
 						throw new Error(error.response.data.message);
 					});
 			},
