@@ -56,9 +56,15 @@ export const authOptions: NextAuthOptions = {
 			if (token.accessToken) {
 				const decoded = parseJwt(token.accessToken as string);
 				if (Date.now() >= decoded.exp * 1000) {
-					const res = await axios.post('/auth/refresh', {
-						refreshToken: token.refreshToken,
-					});
+					const res = await axios.post(
+						'/auth/refresh',
+						{
+							refreshToken: token.refreshToken,
+						},
+						{
+							baseURL: process.env.NEXT_PUBLIC_AUTH_API,
+						},
+					);
 
 					token.accessToken = res.data.accessToken;
 					token.refreshToken = res.data.refreshToken;
