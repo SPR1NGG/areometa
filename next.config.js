@@ -17,6 +17,11 @@ module.exports = {
 				protocol: 'https',
 				pathname: '/api/uploads/**',
 			},
+			{
+				hostname: 'aresapi.techno-ares.ru',
+				protocol: 'https',
+				pathname: '/api/uploads/**',
+			},
 		],
 	},
 };

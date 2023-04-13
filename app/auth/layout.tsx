@@ -18,7 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 				<div className="flex justify-center items-center gap-4">
 					<Image priority src={'/logo.png'} alt="логотип" width={74} height={43} />
 					<p>Разработано с помощью технологии Aresmeta</p>
-					<Image priority src={'/metaworld.png'} alt="метамир" width={166} height={42} />
+					<Image priority src={'/vmir.svg'} alt="метамир" width={166} height={42} />
 				</div>
 			</div>
 		</div>

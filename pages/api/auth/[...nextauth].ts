@@ -25,10 +25,16 @@ export const authOptions: NextAuthOptions = {
 				console.log('start');
 				const { username, password } = credentials as any;
 				return axios
-					.post('/auth/login', {
-						email: username,
-						password,
-					})
+					.post(
+						'/auth/login',
+						{
+							email: username,
+							password,
+						},
+						{
+							baseURL: process.env.NEXT_PUBLIC_AUTH_API,
+						},
+					)
 					.then((res) => {
 						return res.data;
 					})

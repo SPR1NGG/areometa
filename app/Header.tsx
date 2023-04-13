@@ -39,7 +39,7 @@ const Header = () => {
 				</div>
 				<Link
 					className="bg-[linear-gradient(93deg,#E86605,#FCDF00)] text-white font-medium rounded-xl px-8 py-4"
-					href="https://aresmeta.sqkrv.com/"
+					href={process.env.NEXT_PUBLIC_META_URL!}
 				>
 					Войти в метавселенную
 				</Link>
