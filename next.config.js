@@ -5,6 +5,11 @@ module.exports = {
 		appDir: true,
 	},
 	images: {
+		// domains: ['localhosting.com'],
+		// path: 'test',
+		// loader: 'imgix',
+		loader: 'custom',
+		loaderFile: './my/image/loader.ts',
 		remotePatterns: [
 			{
 				hostname: 'localhost',
