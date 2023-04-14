@@ -1,6 +1,6 @@
 'use client';
 import ConferenceService from 'api/services/conferenceService';
-import { BASE_URL } from 'lib/axios';
+import { BASE_URL, UPLOAD_URL } from 'lib/axios';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { AiFillDelete } from 'react-icons/ai';
@@ -61,7 +61,7 @@ const Room = (conference: IConference) => {
 				<Image
 					priority
 					className="h-[90px]"
-					src={`${BASE_URL}/uploads/${banner_filename || media_file[0].filename}`}
+					src={`${UPLOAD_URL}${banner_filename || media_file[0].filename}`}
 					alt="баннер"
 					height={90}
 					width={160}
