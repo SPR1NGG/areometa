@@ -4,11 +4,10 @@ import TextBox from '@components/TextBox';
 import { ErrorMessage } from '@hookform/error-message';
 import UserService from 'api/services/userService';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { SlLock } from 'react-icons/sl';
 import { toast } from 'react-toastify';
-import { ToastItem } from 'react-toastify/dist/types';
 
 type Inputs = {
 	newpass: string;
@@ -18,7 +17,9 @@ interface Props {
 	searchParams?: { [key: string]: string };
 }
 
-const page = ({ searchParams }: Props) => {
+export const dynamic='force-dynamic';
+
+const Page = () => {
 	const {
 		register,
 		handleSubmit,
@@ -26,10 +27,11 @@ const page = ({ searchParams }: Props) => {
 		formState: { errors },
 	} = useForm<Inputs>();
 	const router = useRouter();
+	const token = useSearchParams()?.get('token');
 
 	const onSubmit = async (data: Inputs) => {
-		if (searchParams) {
-			await UserService.reset(searchParams.token, data.newpass);
+		if (token) {
+			await UserService.reset(token, data.newpass);
 			reset({ newpass: '' });
 			toast.success('Пароль успешно изменён');
 			toast.onChange(() => {
@@ -37,9 +39,6 @@ const page = ({ searchParams }: Props) => {
 			});
 		}
 	};
-
-	console.log(searchParams)
-
 
 	return (
 		<div className="bg-[linear-gradient(#E86604,#FCDE00)] w-[500px] p-[1px] rounded-2xl mb-16">
@@ -78,4 +77,4 @@ const page = ({ searchParams }: Props) => {
 	);
 };
 
-export default page;
+export default Page;
