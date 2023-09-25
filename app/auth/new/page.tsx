@@ -38,6 +38,9 @@ const page = ({ searchParams }: Props) => {
 		}
 	};
 
+	console.log(searchParams)
+
+
 	return (
 		<div className="bg-[linear-gradient(#E86604,#FCDE00)] w-[500px] p-[1px] rounded-2xl mb-16">
 			<form className="bg-white rounded-2xl px-16 py-10 flex flex-col gap-8">
